@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,6 +56,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  bool _isLoading = false;
 
   final List<Widget> _screens = [
     const VaultScreen(),
@@ -72,11 +74,69 @@ class _MainScreenState extends State<MainScreen> {
     NavItem(icon: Icons.settings, label: 'Settings'),
   ];
 
+  Future<void> _handleTabTap(int index) async {
+    if (_currentIndex == index) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate loading delay
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    setState(() {
+      _currentIndex = index;
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: Stack(
+        children: [
+          _screens[_currentIndex],
+          if (_isLoading) _buildLoadingOverlay(),
+        ],
+      ),
       bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildLoadingOverlay() {
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+      child: Container(
+        color: AppColors.background.withOpacity(0.3),
+        child: Center(
+          child: SizedBox(
+            width: 90,
+            height: 90,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Circular progress indicator around the logo
+                SizedBox(
+                  width: 85,
+                  height: 85,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    backgroundColor: AppColors.primary.withOpacity(0.2),
+                  ),
+                ),
+                // Logo in the center (inside the spinner)
+                Image.asset(
+                  'assets/logo/app_logo_bg_remover.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.contain,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -124,11 +184,7 @@ class _MainScreenState extends State<MainScreen> {
     final isSelected = _currentIndex == index;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
+      onTap: () => _handleTabTap(index),
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.spaceXs,
