@@ -1,0 +1,107 @@
+ .gitignore                                         |  53 [32m++[m
+ .metadata                                          |  30 [32m+[m
+ AGENTS.md                                          | 182 [32m+++++[m
+ DESIGN.md                                          | 199 [32m++++++[m
+ EMAIL_VERIFICATION_FIXES.md                        | 439 [32m++++++++++++[m
+ FIREBASE_SETUP.md                                  | 238 [32m+++++++[m
+ PLAYSTORE_NOTES.md                                 | 171 [32m+++++[m
+ README.md                                          |  17 [32m+[m
+ RELEASE_NOTES.md                                   | 124 [32m++++[m
+ analysis_options.yaml                              |  38 [32m++[m
+ android/.gitignore                                 |  14 [32m+[m
+ android/app/build.gradle.kts                       |  76 [32m+++[m
+ android/app/google-services.json                   |  68 [32m++[m
+ android/app/src/debug/AndroidManifest.xml          |   7 [32m+[m
+ android/app/src/main/AndroidManifest.xml           |  53 [32m++[m
+ .../kotlin/com/devtrisoft/passbox/MainActivity.kt  |   5 [32m+[m
+ .../res/drawable-hdpi/ic_launcher_foreground.png   | Bin [31m0[m -> [32m22723[m bytes
+ .../res/drawable-mdpi/ic_launcher_foreground.png   | Bin [31m0[m -> [32m10157[m bytes
+ .../main/res/drawable-v21/launch_background.xml    |  12 [32m+[m
+ .../res/drawable-xhdpi/ic_launcher_foreground.png  | Bin [31m0[m -> [32m40760[m bytes
+ .../res/drawable-xxhdpi/ic_launcher_foreground.png | Bin [31m0[m -> [32m92990[m bytes
+ .../drawable-xxxhdpi/ic_launcher_foreground.png    | Bin [31m0[m -> [32m167790[m bytes
+ .../src/main/res/drawable/launch_background.xml    |  12 [32m+[m
+ .../src/main/res/mipmap-anydpi-v26/ic_launcher.xml |   9 [32m+[m
+ .../app/src/main/res/mipmap-hdpi/ic_launcher.png   | Bin [31m0[m -> [32m4755[m bytes
+ .../app/src/main/res/mipmap-mdpi/ic_launcher.png   | Bin [31m0[m -> [32m2347[m bytes
+ .../app/src/main/res/mipmap-xhdpi/ic_launcher.png  | Bin [31m0[m -> [32m8129[m bytes
+ .../app/src/main/res/mipmap-xxhdpi/ic_launcher.png | Bin [31m0[m -> [32m17943[m bytes
+ .../src/main/res/mipmap-xxxhdpi/ic_launcher.png    | Bin [31m0[m -> [32m32348[m bytes
+ android/app/src/main/res/values-night/styles.xml   |  18 [32m+[m
+ android/app/src/main/res/values/colors.xml         |   4 [32m+[m
+ android/app/src/main/res/values/styles.xml         |  18 [32m+[m
+ android/app/src/profile/AndroidManifest.xml        |   7 [32m+[m
+ android/build.gradle.kts                           |  21 [32m+[m
+ .../build/reports/problems/problems-report.html    | 659 [32m++++++++++++++++++[m
+ android/gradle.properties                          |  13 [32m+[m
+ android/gradle/wrapper/gradle-wrapper.properties   |   5 [32m+[m
+ android/settings.gradle.kts                        |  27 [32m+[m
+ assets/icons/app_icon.jpg                          | Bin [31m0[m -> [32m383053[m bytes
+ assets/logo/app_logo_bg_remover.png                | Bin [31m0[m -> [32m107435[m bytes
+ assets/logo/app_logo_dark.jpg                      | Bin [31m0[m -> [32m484671[m bytes
+ assets/lottie/Forgot Password.json                 |   1 [32m+[m
+ assets/lottie/question_mark_forget_password.json   |   1 [32m+[m
+ fonts/README.md                                    |  41 [32m++[m
+ ios/.gitignore                                     |  34 [32m+[m
+ ios/Flutter/AppFrameworkInfo.plist                 |  24 [32m+[m
+ ios/Flutter/Debug.xcconfig                         |   1 [32m+[m
+ ios/Flutter/Release.xcconfig                       |   1 [32m+[m
+ ios/Runner.xcodeproj/project.pbxproj               | 647 [32m++++++++++++++++++[m
+ .../project.xcworkspace/contents.xcworkspacedata   |   7 [32m+[m
+ .../xcshareddata/IDEWorkspaceChecks.plist          |   8 [32m+[m
+ .../xcshareddata/WorkspaceSettings.xcsettings      |   8 [32m+[m
+ .../xcshareddata/xcschemes/Runner.xcscheme         | 119 [32m++++[m
+ ios/Runner.xcworkspace/contents.xcworkspacedata    |   7 [32m+[m
+ .../xcshareddata/IDEWorkspaceChecks.plist          |   8 [32m+[m
+ .../xcshareddata/WorkspaceSettings.xcsettings      |   8 [32m+[m
+ ios/Runner/AppDelegate.swift                       |  16 [32m+[m
+ .../AppIcon.appiconset/Contents.json               |   1 [32m+[m
+ .../AppIcon.appiconset/Icon-App-1024x1024@1x.png   | Bin [31m0[m -> [32m634633[m bytes
+ .../AppIcon.appiconset/Icon-App-20x20@1x.png       | Bin [31m0[m -> [32m557[m bytes
+ .../AppIcon.appiconset/Icon-App-20x20@2x.png       | Bin [31m0[m -> [32m1703[m bytes
+ .../AppIcon.appiconset/Icon-App-20x20@3x.png       | Bin [31m0[m -> [32m3437[m bytes
+ .../AppIcon.appiconset/Icon-App-29x29@1x.png       | Bin [31m0[m -> [32m976[m bytes
+ .../AppIcon.appiconset/Icon-App-29x29@2x.png       | Bin [31m0[m -> [32m3206[m bytes
+ .../AppIcon.appiconset/Icon-App-29x29@3x.png       | Bin [31m0[m -> [32m6720[m bytes
+ .../AppIcon.appiconset/Icon-App-40x40@1x.png       | Bin [31m0[m -> [32m1703[m bytes
+ .../AppIcon.appiconset/Icon-App-40x40@2x.png       | Bin [31m0[m -> [32m5688[m bytes
+ .../AppIcon.appiconset/Icon-App-40x40@3x.png       | Bin [31m0[m -> [32m12511[m bytes
+ .../AppIcon.appiconset/Icon-App-50x50@1x.png       | Bin [31m0[m -> [32m2510[m bytes
+ .../AppIcon.appiconset/Icon-App-50x50@2x.png       | Bin [31m0[m -> [32m8714[m bytes
+ .../AppIcon.appiconset/Icon-App-57x57@1x.png       | Bin [31m0[m -> [32m3144[m bytes
+ .../AppIcon.appiconset/Icon-App-57x57@2x.png       | Bin [31m0[m -> [32m11268[m bytes
+ .../AppIcon.appiconset/Icon-App-60x60@2x.png       | Bin [31m0[m -> [32m12511[m bytes
+ .../AppIcon.appiconset/Icon-App-60x60@3x.png       | Bin [31m0[m -> [32m28009[m bytes
+ .../AppIcon.appiconset/Icon-App-72x72@1x.png       | Bin [31m0[m -> [32m4755[m bytes
+ .../AppIcon.appiconset/Icon-App-72x72@2x.png       | Bin [31m0[m -> [32m17943[m bytes
+ .../AppIcon.appiconset/Icon-App-76x76@1x.png       | Bin [31m0[m -> [32m5246[m bytes
+ .../AppIcon.appiconset/Icon-App-76x76@2x.png       | Bin [31m0[m -> [32m19986[m bytes
+ .../AppIcon.appiconset/Icon-App-83.5x83.5@2x.png   | Bin [31m0[m -> [32m24036[m bytes
+ .../LaunchImage.imageset/Contents.json             |  23 [32m+[m
+ .../LaunchImage.imageset/LaunchImage.png           | Bin [31m0[m -> [32m68[m bytes
+ .../LaunchImage.imageset/LaunchImage@2x.png        | Bin [31m0[m -> [32m68[m bytes
+ .../LaunchImage.imageset/LaunchImage@3x.png        | Bin [31m0[m -> [32m68[m bytes
+ .../Assets.xcassets/LaunchImage.imageset/README.md |   5 [32m+[m
+ ios/Runner/Base.lproj/LaunchScreen.storyboard      |  37 [32m+[m
+ ios/Runner/Base.lproj/Main.storyboard              |  26 [32m+[m
+ ios/Runner/Info.plist                              |  70 [32m++[m
+ ios/Runner/Runner-Bridging-Header.h                |   1 [32m+[m
+ ios/Runner/SceneDelegate.swift                     |   6 [32m+[m
+ ios/RunnerTests/RunnerTests.swift                  |  12 [32m+[m
+ lib/core/constants/app_border_radius.dart          |  27 [32m+[m
+ lib/core/constants/app_spacing.dart                |  26 [32m+[m
+ lib/core/constants/constants.dart                  |   3 [32m+[m
+ lib/core/core.dart                                 |   5 [32m+[m
+ lib/core/services/admob_service.dart               | 208 [32m++++++[m
+ lib/core/styles/app_shadows.dart                   |  47 [32m++[m
+ lib/core/styles/styles.dart                        |   2 [32m+[m
+ lib/core/theme/app_colors.dart                     |  80 [32m+++[m
+ lib/core/theme/app_fonts.dart                      |  25 [32m+[m
+ lib/core/theme/app_text_styles.dart                |  89 [32m+++[m
+ lib/core/theme/app_theme.dart                      | 312 [32m+++++++++[m
+ lib/core/theme/theme.dart                          |   5 [32m+[m
+ lib/features/auth/auth.dart                        |   7 [32m+[m
+ lib/features/auth/auth_service.dart                | 282 [32m++++++++[m
+ lib/features/auth/forgot_password_screen.dart      | 274 [32m++++++++[m
+ lib/features/auth/login_screen.dart                | 539 [32m+++++++++++++++[m
+ lib/features/auth/models/user_
