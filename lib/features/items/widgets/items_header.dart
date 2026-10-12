@@ -27,7 +27,7 @@ class ItemsHeader extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Aegis',
+                      'PassBox',
                       style: AppTextStyles.headlineSm.copyWith(
                         color: AppColors.onSurface,
                       ),

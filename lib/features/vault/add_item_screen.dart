@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'dart:math';
 import '../../core/core.dart';
-import '../categories/category_service.dart';
-import '../categories/models/category.dart' as CategoryModel;
 import '../vault/vault_service.dart';
 import '../vault/models/vault.dart';
 import '../auth/auth_service.dart';
@@ -17,7 +16,6 @@ class AddItemScreen extends StatefulWidget {
 class _AddItemScreenState extends State<AddItemScreen> {
   final _formKey = GlobalKey<FormState>();
   final VaultService _vaultService = VaultService();
-  final CategoryService _categoryService = CategoryService();
   final AuthService _authService = AuthService();
 
   final _serviceController = TextEditingController();
@@ -25,19 +23,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final _passwordController = TextEditingController();
   final _iconController = TextEditingController();
 
-  String _selectedCategory = 'Other';
   bool _isFavorite = false;
-  bool _isSecure = true;
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _showEmojiPicker = false;
 
-  List<CategoryModel.Category> _categories = [];
-
   @override
   void initState() {
     super.initState();
-    _loadCategories();
   }
 
   @override
@@ -47,20 +40,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
     _passwordController.dispose();
     _iconController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadCategories() async {
-    try {
-      final categories = await _categoryService.getAllCategories();
-      setState(() {
-        _categories = categories;
-        if (categories.isNotEmpty) {
-          _selectedCategory = categories.first.name;
-        }
-      });
-    } catch (e) {
-      print('Error loading categories: $e');
-    }
   }
 
   String _generatePassword() {
@@ -87,8 +66,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
         password: _passwordController.text,
         icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
         isFavorite: _isFavorite,
-        isSecure: _isSecure,
-        category: _selectedCategory,
         version: 1,
       );
 
@@ -165,6 +142,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSpacing.spaceMd),
+                // Lottie Animation
+                Lottie.asset(
+                  'assets/lottie/add item lock.json',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: AppSpacing.spaceMd),
                 _buildServiceField(),
                 const SizedBox(height: AppSpacing.spaceMd),
                 _buildUsernameField(),
@@ -172,8 +157,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 _buildPasswordField(),
                 const SizedBox(height: AppSpacing.spaceMd),
                 _buildIconField(),
-                const SizedBox(height: AppSpacing.spaceMd),
-                _buildCategoryDropdown(),
                 const SizedBox(height: AppSpacing.spaceMd),
                 _buildToggleOptions(),
                 const SizedBox(height: AppSpacing.spaceXl),
@@ -469,49 +452,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildCategoryDropdown() {
-    return DropdownButtonFormField<String>(
-      value: _selectedCategory,
-      decoration: InputDecoration(
-        labelText: 'Category',
-        prefixIcon: const Icon(Icons.folder_outlined),
-        labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
-        ),
-        filled: true,
-        fillColor: AppColors.surfaceContainer,
-        border: OutlineInputBorder(
-          borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-        ),
-      ),
-      items: [
-        'Other',
-        ..._categories.map((cat) => cat.name),
-      ].map((String category) {
-        return DropdownMenuItem<String>(
-          value: category,
-          child: Text(category),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        if (newValue != null) {
-          setState(() {
-            _selectedCategory = newValue;
-          });
-        }
-      },
-    );
-  }
-
   Widget _buildToggleOptions() {
     return Column(
       children: [
@@ -528,23 +468,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
           onChanged: (bool value) {
             setState(() {
               _isFavorite = value;
-            });
-          },
-          activeColor: AppColors.primary,
-        ),
-        SwitchListTile(
-          title: Text(
-            'Secure Item',
-            style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
-          ),
-          subtitle: Text(
-            'Mark as sensitive information',
-            style: AppTextStyles.bodySm.copyWith(color: AppColors.onSurfaceVariant),
-          ),
-          value: _isSecure,
-          onChanged: (bool value) {
-            setState(() {
-              _isSecure = value;
             });
           },
           activeColor: AppColors.primary,

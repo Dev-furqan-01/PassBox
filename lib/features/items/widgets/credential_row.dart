@@ -295,6 +295,25 @@ class _ServiceIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if icon is an emoji (single character from emoji ranges)
+    if (icon != null && _isEmoji(icon!)) {
+      return Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerHigh,
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
+        ),
+        child: Center(
+          child: Text(
+            icon!,
+            style: const TextStyle(fontSize: 24),
+          ),
+        ),
+      );
+    }
+
+    // Fallback to Material Icon
     return Container(
       width: 36,
       height: 36,
@@ -308,6 +327,31 @@ class _ServiceIcon extends StatelessWidget {
         size: 20,
       ),
     );
+  }
+
+  bool _isEmoji(String text) {
+    // Check if the string is a single emoji character
+    if (text.isEmpty) return false;
+    if (text.length > 2) return false; // Most emojis are 1-2 chars
+
+    // Check for emoji ranges
+    final runes = text.runes.toList();
+    if (runes.length != 1 && runes.length != 2) return false;
+
+    final code = runes.first;
+    // Basic emoji ranges
+    return (code >= 0x1F600 && code <= 0x1F64F) || // Emoticons
+           (code >= 0x1F300 && code <= 0x1F5FF) || // Misc Symbols and Pictographs
+           (code >= 0x1F680 && code <= 0x1F6FF) || // Transport and Map
+           (code >= 0x1F1E0 && code <= 0x1F1FF) || // Flags
+           (code >= 0x2600 && code <= 0x26FF) ||   // Misc symbols
+           (code >= 0x2700 && code <= 0x27BF) ||   // Dingbats
+           (code >= 0x1F900 && code <= 0x1F9FF) || // Supplemental Symbols and Pictographs
+           (code >= 0x1FA00 && code <= 0x1FA6F) || // Chess Symbols
+           (code >= 0x1FA70 && code <= 0x1FAFF) || // Symbols and Pictographs Extended-A
+           (code >= 0x23F0 && code <= 0x23FF) ||   // Time & Clock
+           (code >= 0x2B50 && code <= 0x2B55) ||   // Stars
+           (code >= 0x2139 && code <= 0x213F);     // Information Source
   }
 
   IconData _getIconFromString(String? iconName) {

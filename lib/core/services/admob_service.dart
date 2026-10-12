@@ -153,9 +153,11 @@ class AdMobService {
 
   /// Load a banner ad
   Future<void> loadBannerAd() async {
-    if (_isBannerLoaded) {
-      debugPrint('Banner ad already loaded');
-      return;
+    // Dispose existing banner ad before loading a new one
+    if (_bannerAd != null) {
+      _bannerAd!.dispose();
+      _bannerAd = null;
+      _isBannerLoaded = false;
     }
 
     debugPrint('Loading banner ad...');

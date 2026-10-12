@@ -36,7 +36,7 @@ class AboutSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Aegis Vault',
+                    'PassBox',
                     style: AppTextStyles.headlineMd.copyWith(
                       color: AppColors.onSurface,
                       fontWeight: FontWeight.w700,

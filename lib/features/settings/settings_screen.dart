@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/core.dart';
 import '../../../core/services/admob_service.dart';
 import '../auth/auth_service.dart';
+import '../vault/vault_service.dart';
 import 'models/app_settings.dart';
 import 'widgets/settings_section.dart';
 import 'widgets/about_section.dart';
@@ -21,13 +22,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _biometricService = BiometricService();
   final _credentialStorage = CredentialStorageService();
   final _adMobService = AdMobService();
+  final _vaultService = VaultService();
   final List<SettingsItem> _accountItems = [];
   final List<SettingsItem> _securityItems = [];
-  final List<SettingsItem> _appearanceItems = [];
   final List<SettingsItem> _dataItems = [];
   bool _isBiometricAvailable = false;
   bool _isBiometricEnabled = false;
   bool _isProcessingSubscription = false;
+
+  String? get currentUserId => _authService.currentUser?.uid;
 
   @override
   void initState() {
@@ -112,18 +115,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     ]);
 
-    _appearanceItems.addAll([
-      SettingsItem(
-        id: 'language',
-        title: 'Language',
-        description: 'App display language',
-        icon: Icons.language,
-        iconColor: AppColors.secondary,
-        type: SettingsItemType.navigation,
-        value: 'English',
-      ),
-    ]);
-
     _dataItems.addAll([
       SettingsItem(
         id: 'delete',
@@ -154,6 +145,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (itemId == 'subscription') {
       await _handleSubscription();
+      return;
+    }
+
+    if (itemId == 'delete') {
+      await _handleDeleteData();
       return;
     }
 
@@ -208,6 +204,160 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         setState(() => _isProcessingSubscription = false);
       }
+    }
+  }
+
+  Future<void> _handleDeleteData() async {
+    // Check biometric status
+    final isBiometricEnabled = await _biometricService.isBiometricEnabled();
+    bool isVerified = false;
+
+    if (isBiometricEnabled) {
+      // Require biometric verification
+      try {
+        isVerified = await _biometricService.authenticate(
+          localizedReason: 'Verify your identity to delete all data',
+        );
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Biometric authentication failed: ${e.toString().replaceAll('Exception: ', '')}'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+    } else {
+      // Require password verification
+      final password = await showDialog<String>(
+        context: context,
+        builder: (context) => _PasswordInputDialog(),
+      );
+
+      if (password == null) {
+        // User cancelled
+        return;
+      }
+
+      // Verify password with auth service
+      try {
+        final user = _authService.currentUser;
+        if (user != null) {
+          final credential = await _authService.reauthenticate(
+            user.email!,
+            password,
+          );
+          isVerified = credential != null;
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Password verification failed'),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    if (!isVerified) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Verification failed'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      return;
+    }
+
+    // Show final confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surfaceContainer,
+        title: Text(
+          'Delete All Data',
+          style: AppTextStyles.headlineSm.copyWith(
+            color: AppColors.onSurface,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to permanently delete all vault data? This action cannot be undone.',
+          style: AppTextStyles.bodyMd.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: AppTextStyles.bodyMd.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              'Delete',
+              style: AppTextStyles.bodyMd.copyWith(
+                color: AppColors.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        // Delete all vault data
+        await _deleteAllVaultData();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('All data deleted successfully'),
+              backgroundColor: AppColors.secondary,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete data: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _deleteAllVaultData() async {
+    final userId = currentUserId;
+    if (userId == null) {
+      throw Exception('User not authenticated');
+    }
+
+    // Get all vaults
+    final vaults = await _vaultService.getAllVaults();
+
+    // Delete each vault
+    for (final vault in vaults) {
+      await _vaultService.deleteVault(vault.vaultId);
     }
   }
 
@@ -426,20 +576,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
 
-      final appearanceIndex = _appearanceItems.indexWhere((item) => item.id == itemId);
-      if (appearanceIndex != -1) {
-        _appearanceItems[appearanceIndex] = SettingsItem(
-          id: _appearanceItems[appearanceIndex].id,
-          title: _appearanceItems[appearanceIndex].title,
-          description: _appearanceItems[appearanceIndex].description,
-          icon: _appearanceItems[appearanceIndex].icon,
-          iconColor: _appearanceItems[appearanceIndex].iconColor,
-          type: _appearanceItems[appearanceIndex].type,
-          isEnabled: value,
-          value: _appearanceItems[appearanceIndex].value,
-        );
-      }
-
       final dataIndex = _dataItems.indexWhere((item) => item.id == itemId);
       if (dataIndex != -1) {
         _dataItems[dataIndex] = SettingsItem(
@@ -478,6 +614,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsSection(
                 title: 'Security',
                 items: _securityItems,
+                onItemTap: _handleItemTap,
+                onToggle: _handleToggle,
+              ),
+              const SizedBox(height: AppSpacing.spaceMd),
+              SettingsSection(
+                title: 'Data',
+                items: _dataItems,
                 onItemTap: _handleItemTap,
                 onToggle: _handleToggle,
               ),
@@ -751,6 +894,99 @@ class _CredentialInputDialogState extends State<_CredentialInputDialog> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PasswordInputDialog extends StatefulWidget {
+  @override
+  State<_PasswordInputDialog> createState() => _PasswordInputDialogState();
+}
+
+class _PasswordInputDialogState extends State<_PasswordInputDialog> {
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppColors.surfaceContainer,
+      title: Text(
+        'Verify Password',
+        style: AppTextStyles.headlineSm.copyWith(
+          color: AppColors.onSurface,
+        ),
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Enter your password to verify your identity.',
+                style: AppTextStyles.bodySm.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.spaceMd),
+              TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: const Icon(Icons.lock_outlined),
+                  filled: true,
+                  fillColor: AppColors.background,
+                  border: OutlineInputBorder(
+                    borderRadius: AppBorderRadius.defaultRadiusBorder,
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            'Cancel',
+            style: AppTextStyles.bodyMd.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              Navigator.pop(context, _passwordController.text);
+            }
+          },
+          child: Text(
+            'Verify',
+            style: AppTextStyles.bodyMd.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );

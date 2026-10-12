@@ -4,10 +4,10 @@ import '../../../core/core.dart';
 import 'models/credential_item.dart';
 import 'widgets/items_header.dart';
 import 'widgets/items_search_bar.dart';
-import 'widgets/sort_toolbar.dart';
 import 'widgets/credential_row.dart';
 import '../vault/vault_service.dart';
 import '../vault/models/vault.dart' as VaultModel;
+import '../vault/add_item_screen.dart';
 import '../auth/auth_service.dart';
 
 class ItemsScreen extends StatefulWidget {
@@ -19,8 +19,6 @@ class ItemsScreen extends StatefulWidget {
 
 class _ItemsScreenState extends State<ItemsScreen> {
   String _selectedFilter = 'all';
-  String _currentSort = 'Recently Used';
-  bool _isCompactView = false;
   final TextEditingController _searchController = TextEditingController();
   final VaultService _vaultService = VaultService();
   final AuthService _authService = AuthService();
@@ -407,6 +405,24 @@ class _ItemsScreenState extends State<ItemsScreen> {
           _recentlyUsedItems.removeWhere((i) => i.id == item.id);
           _alphabeticalItems.add(itemToMove);
         }
+
+        // Update filter counts
+        _filters = _filters.map((filter) {
+          if (filter.id == 'favorites') {
+            return FilterOption(
+              id: filter.id,
+              label: filter.label,
+              count: _allItems.where((v) => v.isFavorite).length,
+              icon: filter.icon,
+              iconColor: filter.iconColor,
+              showDot: filter.showDot,
+              dotColor: filter.dotColor,
+              countColor: filter.countColor,
+              countTextColor: filter.countTextColor,
+            );
+          }
+          return filter;
+        }).toList();
       });
 
       // Update backend
@@ -470,7 +486,6 @@ class _ItemsScreenState extends State<ItemsScreen> {
                               _applyFilter();
                             });
                           },
-                          onVoiceTap: () {},
                           filters: _filters,
                           selectedFilter: _selectedFilter,
                           onFilterSelected: (filter) {
@@ -479,21 +494,6 @@ class _ItemsScreenState extends State<ItemsScreen> {
                               _applyFilter();
                             });
                           },
-                        ),
-                        SortToolbar(
-                          currentSort: _currentSort,
-                          onSortChanged: (sort) {
-                            setState(() {
-                              _currentSort = sort;
-                            });
-                          },
-                          onViewToggle: () {
-                            setState(() {
-                              _isCompactView = !_isCompactView;
-                            });
-                          },
-                          onSelectMode: () {},
-                          isCompactView: _isCompactView,
                         ),
                       ],
                     ),
@@ -507,13 +507,6 @@ class _ItemsScreenState extends State<ItemsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: AppSpacing.spaceXs),
-                          _buildSectionHeader(
-                            icon: Icons.history,
-                            iconColor: AppColors.primary,
-                            title: 'Recently Used',
-                            count: '${_recentlyUsedItems.length} Vault Items',
-                          ),
-                          const SizedBox(height: AppSpacing.spaceXs),
                           ..._recentlyUsedItems.map((item) {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 4),
@@ -526,14 +519,6 @@ class _ItemsScreenState extends State<ItemsScreen> {
                               ),
                             );
                           }),
-                          const SizedBox(height: AppSpacing.spaceMd),
-                          _buildSectionHeader(
-                            icon: Icons.folder,
-                            iconColor: AppColors.outline,
-                            title: 'N – S',
-                            count: '${_alphabeticalItems.length} Vault Items',
-                          ),
-                          const SizedBox(height: AppSpacing.spaceXs),
                           ..._alphabeticalItems.map((item) {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 4),
@@ -554,42 +539,21 @@ class _ItemsScreenState extends State<ItemsScreen> {
                 ],
               ),
       ),
-    );
-  }
-
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String count,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(
-              icon,
-              color: iconColor,
-              size: 13,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddItemScreen(),
             ),
-            const SizedBox(width: 4),
-            Text(
-              title.toUpperCase(),
-              style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.onSurfaceVariant,
-                letterSpacing: 0.1,
-              ),
-            ),
-          ],
-        ),
-        Text(
-          count,
-          style: AppTextStyles.labelBadge.copyWith(
-            color: AppColors.outline,
-          ),
-        ),
-      ],
+          );
+          _loadData();
+        },
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.onPrimary,
+        elevation: 4,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

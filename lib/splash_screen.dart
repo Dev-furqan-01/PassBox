@@ -104,7 +104,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
             const SizedBox(height: AppSpacing.spaceXl),
             Text(
-              'Aegis Vault',
+              'PassBox',
               style: AppTextStyles.headlineXl.copyWith(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w700,
@@ -112,7 +112,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
             const SizedBox(height: AppSpacing.spaceSm),
             Text(
-              'Secure Your Digital Life',
+              'Secure Password Manager',
               style: AppTextStyles.bodyMd.copyWith(
                 color: AppColors.onSurfaceVariant,
               ),

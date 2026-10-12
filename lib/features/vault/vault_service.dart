@@ -16,7 +16,7 @@ class VaultService {
     String? icon,
     bool isFavorite = false,
     bool isSecure = true,
-    required String category,
+    String category = 'Other',
     int version = 1,
   }) async {
     try {

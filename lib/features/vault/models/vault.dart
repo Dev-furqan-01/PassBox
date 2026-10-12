@@ -23,7 +23,7 @@ class Vault {
     this.icon,
     this.isFavorite = false,
     this.isSecure = true,
-    required this.category,
+    this.category = 'Other',
     required this.lastUpdated,
     this.version = 1,
     required this.createdAt,

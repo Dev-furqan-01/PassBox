@@ -550,7 +550,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 Row(
                   children: [
                     Text(
-                      'Aegis',
+                      'PassBox',
                       style: AppTextStyles.headlineSm.copyWith(
                         color: AppColors.onSurface,
                       ),

@@ -136,6 +136,38 @@ class AuthService {
     }
   }
 
+  Future<UserCredential?> reauthenticate(String email, String password) async {
+    try {
+      final user = currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+
+      final userCredential = await user.reauthenticateWithCredential(credential);
+
+      await logSecurityEvent(
+        type: SecurityEventType.login,
+        description: 'User reauthenticated successfully',
+      );
+
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      await logSecurityEvent(
+        type: SecurityEventType.login,
+        description: 'Failed reauthentication attempt',
+        metadata: {'error': e.code},
+      );
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw Exception('Reauthentication failed: $e');
+    }
+  }
+
   Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(

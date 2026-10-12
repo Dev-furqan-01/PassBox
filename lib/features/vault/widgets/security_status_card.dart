@@ -8,7 +8,6 @@ class SecurityStatusCard extends StatelessWidget {
   final int weakPasswords;
   final int reusedPasswords;
   final String lastScanTime;
-  final VoidCallback onScanTap;
 
   const SecurityStatusCard({
     super.key,
@@ -18,7 +17,6 @@ class SecurityStatusCard extends StatelessWidget {
     required this.weakPasswords,
     required this.reusedPasswords,
     required this.lastScanTime,
-    required this.onScanTap,
   });
 
   @override
@@ -97,36 +95,6 @@ class SecurityStatusCard extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: onScanTap,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceContainerHigh,
-                          borderRadius: AppBorderRadius.defaultRadiusBorder,
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.refresh,
-                              color: AppColors.primary,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'SCAN',
-                              style: AppTextStyles.labelBadge.copyWith(
-                                color: AppColors.primary,
-                                letterSpacing: 0.1,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                   ],

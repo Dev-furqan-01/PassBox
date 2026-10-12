@@ -5,14 +5,12 @@ class VaultSearchBar extends StatelessWidget {
   final String hintText;
   final ValueChanged<String> onChanged;
   final VoidCallback onFilterTap;
-  final VoidCallback onVoiceTap;
 
   const VaultSearchBar({
     super.key,
     required this.hintText,
     required this.onChanged,
     required this.onFilterTap,
-    required this.onVoiceTap,
   });
 
   @override
@@ -40,14 +38,6 @@ class VaultSearchBar extends StatelessWidget {
                   Icons.search,
                   color: AppColors.outline,
                   size: 18,
-                ),
-                suffixIcon: GestureDetector(
-                  onTap: onVoiceTap,
-                  child: const Icon(
-                    Icons.mic,
-                    color: AppColors.outline,
-                    size: 16,
-                  ),
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(

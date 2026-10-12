@@ -16,8 +16,10 @@ class SettingsItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      splashColor: AppColors.primary.withOpacity(0.1),
+      highlightColor: AppColors.primary.withOpacity(0.05),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.spaceMd),
         child: Row(

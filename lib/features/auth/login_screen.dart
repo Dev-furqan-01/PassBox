@@ -441,35 +441,33 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLoginButton() {
-    return Expanded(
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleLogin,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.onPrimary,
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppBorderRadius.defaultRadiusBorder,
-          ),
-          elevation: 0,
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _handleLogin,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.onPrimary,
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
-        child: _isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
-                ),
-              )
-            : Text(
-                'Sign In',
-                style: AppTextStyles.bodyLg.copyWith(
-                  color: AppColors.onPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+        elevation: 0,
       ),
+      child: _isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
+              ),
+            )
+          : Text(
+              'Sign In',
+              style: AppTextStyles.bodyLg.copyWith(
+                color: AppColors.onPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
     );
   }
 
@@ -488,22 +486,20 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildBiometricButton() {
-    return Expanded(
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleBiometricLogin,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.secondary,
-          foregroundColor: AppColors.onPrimary,
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppBorderRadius.defaultRadiusBorder,
-          ),
-          elevation: 0,
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _handleBiometricLogin,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.secondary,
+        foregroundColor: AppColors.onPrimary,
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
-        child: const Icon(
-          Icons.fingerprint,
-          size: 28,
-        ),
+        elevation: 0,
+      ),
+      child: const Icon(
+        Icons.fingerprint,
+        size: 28,
       ),
     );
   }

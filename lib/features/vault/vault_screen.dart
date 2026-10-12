@@ -291,7 +291,6 @@ class _VaultScreenState extends State<VaultScreen> {
                             hintText: 'Search ${_favoriteItems.length + _recentItems.length} items, logins, notes...',
                             onChanged: (value) {},
                             onFilterTap: () {},
-                            onVoiceTap: () {},
                           ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           SecurityStatusCard(
@@ -301,7 +300,6 @@ class _VaultScreenState extends State<VaultScreen> {
                             weakPasswords: _weakPasswords,
                             reusedPasswords: _reusedPasswords,
                             lastScanTime: 'Just now',
-                            onScanTap: () {},
                           ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           QuickActions(
@@ -325,11 +323,12 @@ class _VaultScreenState extends State<VaultScreen> {
                           ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           // Banner Ad
-                          Container(
-                            alignment: Alignment.center,
-                            height: 50,
-                            child: _adMobService.getBannerAdWidget(),
-                          ),
+                          if (_adMobService.isBannerLoaded)
+                            Container(
+                              alignment: Alignment.center,
+                              height: 50,
+                              child: _adMobService.getBannerAdWidget(),
+                            ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           _buildPinnedFavorites(),
                           const SizedBox(height: AppSpacing.spaceMd),

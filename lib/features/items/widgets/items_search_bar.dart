@@ -4,7 +4,6 @@ import '../../../core/core.dart';
 class ItemsSearchBar extends StatelessWidget {
   final String hintText;
   final ValueChanged<String> onChanged;
-  final VoidCallback onVoiceTap;
   final List<FilterOption> filters;
   final String selectedFilter;
   final ValueChanged<String> onFilterSelected;
@@ -13,7 +12,6 @@ class ItemsSearchBar extends StatelessWidget {
     super.key,
     required this.hintText,
     required this.onChanged,
-    required this.onVoiceTap,
     required this.filters,
     required this.selectedFilter,
     required this.onFilterSelected,
@@ -51,14 +49,6 @@ class ItemsSearchBar extends StatelessWidget {
                   Icons.search,
                   color: AppColors.outline,
                   size: 20,
-                ),
-                suffixIcon: GestureDetector(
-                  onTap: onVoiceTap,
-                  child: const Icon(
-                    Icons.keyboard_voice,
-                    color: AppColors.outline,
-                    size: 18,
-                  ),
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
