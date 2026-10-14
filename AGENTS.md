@@ -168,6 +168,51 @@ If you get "Firebase options not configured":
 - Check that all dependencies are compatible
 - Verify Android SDK is properly configured
 
+### APK Crashes in Release Mode
+The following issues have been fixed to prevent release mode crashes:
+
+1. **AdMob Ad Unit IDs**: Updated to use test IDs for both debug and release modes. Configure production AdMob IDs before publishing to store.
+
+2. **Firebase iOS Configuration**: Fixed iOS app ID in firebase_options.dart (was using Android app ID).
+
+3. **Signing Configuration**: Updated build.gradle.kts to use debug signing if key.properties is missing (allows release builds without custom keystore).
+
+4. **ProGuard Rules**: Added proguard-rules.pro for Firebase, Google Ads, and Flutter classes.
+
+5. **Internet Permission**: Added INTERNET permission to AndroidManifest.xml (required for Firebase).
+
+### Setting Up Release Signing (Optional)
+For production releases with your own keystore:
+
+1. Generate a keystore:
+   ```bash
+   keytool -genkey -v -keystore ~/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
+   ```
+
+2. Create `android/app/key.properties`:
+   ```
+   storePassword=<your keystore password>
+   keyPassword=<your key password>
+   keyAlias=key
+   storeFile=<path to keystore file>
+   ```
+
+3. Build signed APK:
+   ```bash
+   flutter build apk --release
+   ```
+
+### Setting Up AdMob for Production
+Before publishing to the store:
+
+1. Get your AdMob App ID and ad unit IDs from Google AdMob console
+2. Update `lib/core/services/admob_service.dart`:
+   - Replace `_productionInterstitialAdUnitId` with your actual interstitial ad unit ID
+   - Replace `_productionBannerAdUnitId` with your actual banner ad unit ID
+   - Update the ad unit ID selection logic to use production IDs in release mode
+3. Update `android/app/src/main/AndroidManifest.xml`:
+   - Replace the test AdMob App ID with your production App ID
+
 ## Navigation Routes
 - `/` - SplashScreen
 - `/login` - LoginScreen

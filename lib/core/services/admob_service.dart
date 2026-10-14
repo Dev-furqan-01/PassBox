@@ -26,14 +26,10 @@ class AdMobService {
   // Production banner ad unit ID (replace with your actual AdMob ID before release)
   static const String _productionBannerAdUnitId = 'ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx';
 
-  // Current ad unit IDs (switch to production before release)
-  static const String _interstitialAdUnitId = kDebugMode
-      ? _testInterstitialAdUnitId
-      : _productionInterstitialAdUnitId;
+  // Current ad unit IDs (use test IDs for both debug and release until production IDs are configured)
+  static const String _interstitialAdUnitId = _testInterstitialAdUnitId;
 
-  static const String _bannerAdUnitId = kDebugMode
-      ? _testBannerAdUnitId
-      : _productionBannerAdUnitId;
+  static const String _bannerAdUnitId = _testBannerAdUnitId;
 
   /// Initialize Mobile Ads SDK
   Future<void> initialize() async {

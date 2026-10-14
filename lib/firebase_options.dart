@@ -25,7 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return const FirebaseOptions(
           apiKey: 'AIzaSyC8Rly_fMiKBo1xMxW7j1cnTt7g-MCbnc4',
-          appId: '1:90187469062:android:bbf68cd252796ebbe28e87',
+          appId: '1:90187469062:ios:bbf68cd252796ebbe28e87',
           messagingSenderId: '90187469062',
           projectId: 'vaults-8c948',
           storageBucket: 'vaults-8c948.firebasestorage.app',
