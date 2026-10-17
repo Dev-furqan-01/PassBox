@@ -16,104 +16,114 @@ class VaultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.spaceSm),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: AppBorderRadius.defaultRadiusBorder,
-        boxShadow: AppShadows.cardElevation,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              _ServiceIcon(icon: item.icon),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    final theme = Theme.of(context);
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.spaceSm),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
+          boxShadow: AppShadows.cardElevation,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                _ServiceIcon(icon: item.icon),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.service,
+                        style: AppTextStyles.headlineSm.copyWith(
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        item.username,
+                        style: AppTextStyles.bodySm.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.secondary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '••••••••',
+                  style: AppTextStyles.labelCodeMd.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    letterSpacing: 2,
+                  ),
+                ),
+                Row(
                   children: [
-                    Text(
-                      item.service,
-                      style: AppTextStyles.headlineSm.copyWith(
-                        color: AppColors.onSurface,
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: onCopy,
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppBorderRadius.smRadius,
+                          ),
+                          child: Icon(
+                            Icons.content_copy,
+                            color: theme.colorScheme.onSurfaceVariant,
+                            size: 16,
+                          ),
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      item.username,
-                      style: AppTextStyles.bodySm.copyWith(
-                        color: AppColors.outline,
+                    const SizedBox(width: 4),
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: onFavoriteToggle,
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: AppBorderRadius.smRadius,
+                          ),
+                          child: Icon(
+                            item.isFavorite ? Icons.star : Icons.star_border,
+                            color: item.isFavorite
+                                ? theme.colorScheme.tertiary
+                                : theme.colorScheme.outline,
+                            size: 16,
+                          ),
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ),
-              Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  color: AppColors.secondary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '••••••••',
-                style: AppTextStyles.labelCodeMd.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                  letterSpacing: 2,
-                ),
-              ),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: onCopy,
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceContainerHigh,
-                        borderRadius: AppBorderRadius.smRadius,
-                      ),
-                      child: const Icon(
-                        Icons.content_copy,
-                        color: AppColors.onSurfaceVariant,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: onFavoriteToggle,
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceContainerHigh,
-                        borderRadius: AppBorderRadius.smRadius,
-                      ),
-                      child: Icon(
-                        item.isFavorite ? Icons.star : Icons.star_border,
-                        color: item.isFavorite
-                            ? AppColors.tertiary
-                            : AppColors.outline,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -133,98 +143,108 @@ class VaultListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.spaceSm),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: AppBorderRadius.defaultRadiusBorder,
-        boxShadow: AppShadows.cardElevation,
-      ),
-      child: Row(
-        children: [
-          _ServiceIcon(
-            icon: item.icon,
-            size: 36,
-          ),
-          const SizedBox(width: AppSpacing.spaceSm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.service,
-                        style: AppTextStyles.headlineSm.copyWith(
-                          color: AppColors.onSurface,
+    final theme = Theme.of(context);
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.spaceSm),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
+          boxShadow: AppShadows.cardElevation,
+        ),
+        child: Row(
+          children: [
+            _ServiceIcon(
+              icon: item.icon,
+              size: 36,
+            ),
+            const SizedBox(width: AppSpacing.spaceSm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.service,
+                          style: AppTextStyles.headlineSm.copyWith(
+                            color: theme.colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: item.isSecure
-                            ? AppColors.secondary
-                            : AppColors.tertiary,
-                        shape: BoxShape.circle,
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: item.isSecure
+                              ? theme.colorScheme.secondary
+                              : theme.colorScheme.tertiary,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Text(
-                  item.username,
-                  style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.outline,
+                    ],
                   ),
-                  overflow: TextOverflow.ellipsis,
+                  Text(
+                    item.username,
+                    style: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.outline,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.spaceSm),
+            Row(
+              children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: onCopy,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: AppBorderRadius.defaultRadiusBorder,
+                      ),
+                      child: Icon(
+                        Icons.content_copy,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: onFavoriteToggle,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: AppBorderRadius.defaultRadiusBorder,
+                      ),
+                      child: Icon(
+                        item.isFavorite ? Icons.star : Icons.star_border,
+                        color: item.isFavorite
+                            ? theme.colorScheme.tertiary
+                            : theme.colorScheme.outline,
+                        size: 16,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: AppSpacing.spaceSm),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: onCopy,
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerHigh,
-                    borderRadius: AppBorderRadius.defaultRadiusBorder,
-                  ),
-                  child: const Icon(
-                    Icons.content_copy,
-                    color: AppColors.onSurfaceVariant,
-                    size: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              GestureDetector(
-                onTap: onFavoriteToggle,
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerHigh,
-                    borderRadius: AppBorderRadius.defaultRadiusBorder,
-                  ),
-                  child: Icon(
-                    item.isFavorite ? Icons.star : Icons.star_border,
-                    color: item.isFavorite
-                        ? AppColors.tertiary
-                        : AppColors.outline,
-                    size: 16,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -241,13 +261,14 @@ class _ServiceIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     // Check if icon is an emoji
     if (icon != null && _isEmoji(icon!)) {
       return Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHighest,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.smRadius,
         ),
         child: Center(
@@ -265,12 +286,12 @@ class _ServiceIcon extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHighest,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.smRadius,
         ),
         child: Icon(
           _getIconFromString(icon!),
-          color: AppColors.onSurface,
+          color: theme.colorScheme.onSurface,
           size: size * 0.6,
         ),
       );
@@ -280,12 +301,12 @@ class _ServiceIcon extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHighest,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.smRadius,
         ),
         child: Icon(
           Icons.dns,
-          color: AppColors.onSurface,
+          color: theme.colorScheme.onSurface,
           size: size * 0.6,
         ),
       );

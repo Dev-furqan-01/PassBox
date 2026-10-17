@@ -1,4 +1,5 @@
 export 'security_screen.dart';
+export 'security_screen_responsive.dart';
 export 'models/security_metrics.dart';
 export 'widgets/security_score_card.dart';
 export 'widgets/security_metrics_grid.dart';

@@ -14,9 +14,10 @@ class PasswordConfigSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.lgRadius,
         boxShadow: AppShadows.cardElevation,
       ),
@@ -24,15 +25,16 @@ class PasswordConfigSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLengthControl(),
+          _buildLengthControl(context),
           const SizedBox(height: AppSpacing.spaceMd),
-          _buildRuleToggles(),
+          _buildRuleToggles(context),
         ],
       ),
     );
   }
 
-  Widget _buildLengthControl() {
+  Widget _buildLengthControl(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -41,16 +43,16 @@ class PasswordConfigSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.straighten,
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   'Sequence Length',
                   style: AppTextStyles.headlineSm.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -61,7 +63,7 @@ class PasswordConfigSection extends StatelessWidget {
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainerLowest,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
               child: Row(
@@ -69,14 +71,14 @@ class PasswordConfigSection extends StatelessWidget {
                   Text(
                     config.length.toString(),
                     style: AppTextStyles.labelCodeMd.copyWith(
-                      color: AppColors.primary,
+                      color: theme.colorScheme.primary,
                       letterSpacing: 0.5,
                     ),
                   ),
                   Text(
                     ' Chars',
                     style: AppTextStyles.labelBadge.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant,
                       fontSize: 11,
                     ),
                   ),
@@ -91,10 +93,10 @@ class PasswordConfigSection extends StatelessWidget {
             trackHeight: 8,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
             overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-            activeTrackColor: AppColors.primary,
-            inactiveTrackColor: AppColors.surfaceContainerLowest,
-            thumbColor: AppColors.primary,
-            overlayColor: AppColors.primary.withOpacity(0.2),
+            activeTrackColor: theme.colorScheme.primary,
+            inactiveTrackColor: theme.colorScheme.surfaceContainerHighest,
+            thumbColor: theme.colorScheme.primary,
+            overlayColor: theme.colorScheme.primary.withOpacity(0.2),
           ),
           child: Slider(
             value: config.length.toDouble(),
@@ -112,19 +114,19 @@ class PasswordConfigSection extends StatelessWidget {
             Text(
               '08 MIN',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             Text(
               '32 RECOMMENDED',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             Text(
               '64 MAX',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -133,14 +135,15 @@ class PasswordConfigSection extends StatelessWidget {
     );
   }
 
-  Widget _buildRuleToggles() {
+  Widget _buildRuleToggles(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'COMPLEXITY PARAMETERS',
           style: AppTextStyles.labelBadge.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
             letterSpacing: 0.1,
           ),
         ),
@@ -149,7 +152,7 @@ class PasswordConfigSection extends StatelessWidget {
           icon: 'AZ',
           label: 'Uppercase Letters',
           description: 'A-Z character set',
-          iconColor: AppColors.secondary,
+          iconColor: theme.colorScheme.secondary,
           isEnabled: config.includeUppercase,
           onToggle: (value) {
             onConfigChanged(config.copyWith(includeUppercase: value));
@@ -159,7 +162,7 @@ class PasswordConfigSection extends StatelessWidget {
           icon: 'az',
           label: 'Lowercase Letters',
           description: 'a-z character set',
-          iconColor: AppColors.primary,
+          iconColor: theme.colorScheme.primary,
           isEnabled: config.includeLowercase,
           onToggle: (value) {
             onConfigChanged(config.copyWith(includeLowercase: value));
@@ -169,7 +172,7 @@ class PasswordConfigSection extends StatelessWidget {
           icon: '09',
           label: 'Numbers',
           description: '0-9 numerical digits',
-          iconColor: AppColors.tertiary,
+          iconColor: theme.colorScheme.tertiary,
           isEnabled: config.includeNumbers,
           onToggle: (value) {
             onConfigChanged(config.copyWith(includeNumbers: value));
@@ -179,7 +182,7 @@ class PasswordConfigSection extends StatelessWidget {
           icon: '!#',
           label: 'Special Symbols',
           description: '!@#\$%^&*()_+-=',
-          iconColor: AppColors.error,
+          iconColor: theme.colorScheme.error,
           isEnabled: config.includeSymbols,
           onToggle: (value) {
             onConfigChanged(config.copyWith(includeSymbols: value));
@@ -189,7 +192,7 @@ class PasswordConfigSection extends StatelessWidget {
           icon: 'l1',
           label: 'Exclude Ambiguous',
           description: 'Omit l, 1, I, O, 0 to avoid typo',
-          iconColor: AppColors.outline,
+          iconColor: theme.colorScheme.outline,
           isEnabled: config.excludeAmbiguous,
           onToggle: (value) {
             onConfigChanged(config.copyWith(excludeAmbiguous: value));
@@ -199,7 +202,7 @@ class PasswordConfigSection extends StatelessWidget {
           icon: 'Aa',
           label: 'Pronounceable',
           description: 'Easy to phonetically dictate',
-          iconColor: AppColors.onSurfaceVariant,
+          iconColor: theme.colorScheme.onSurfaceVariant,
           isEnabled: config.pronounceable,
           onToggle: (value) {
             onConfigChanged(config.copyWith(pronounceable: value));
@@ -229,6 +232,7 @@ class _RuleToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => onToggle(!isEnabled),
       child: Container(
@@ -237,7 +241,7 @@ class _RuleToggle extends StatelessWidget {
           vertical: 8,
         ),
         decoration: BoxDecoration(
-          color: isEnabled ? iconColor.withOpacity(0.15) : AppColors.surfaceContainerLow,
+          color: isEnabled ? iconColor.withOpacity(0.15) : theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           border: isEnabled ? Border.all(color: iconColor.withOpacity(0.3), width: 1) : null,
         ),
@@ -250,14 +254,14 @@ class _RuleToggle extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: isEnabled ? iconColor : AppColors.surfaceContainerHighest,
+                    color: isEnabled ? iconColor : theme.colorScheme.surfaceContainerHighest,
                     borderRadius: AppBorderRadius.smRadius,
                   ),
                   child: Center(
                     child: Text(
                       icon,
                       style: AppTextStyles.labelCodeMd.copyWith(
-                        color: isEnabled ? AppColors.onPrimary : iconColor,
+                        color: isEnabled ? theme.colorScheme.onPrimary : iconColor,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -270,14 +274,14 @@ class _RuleToggle extends StatelessWidget {
                     Text(
                       label,
                       style: AppTextStyles.bodyMd.copyWith(
-                        color: isEnabled ? iconColor : AppColors.onSurface,
+                        color: isEnabled ? iconColor : theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Text(
                       description,
                       style: AppTextStyles.bodySm.copyWith(
-                        color: isEnabled ? iconColor.withOpacity(0.7) : AppColors.onSurfaceVariant,
+                        color: isEnabled ? iconColor.withOpacity(0.7) : theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -289,8 +293,8 @@ class _RuleToggle extends StatelessWidget {
               onChanged: onToggle,
               activeColor: iconColor,
               activeTrackColor: iconColor.withOpacity(0.3),
-              inactiveThumbColor: AppColors.onSurface,
-              inactiveTrackColor: AppColors.surfaceContainerHighest,
+              inactiveThumbColor: theme.colorScheme.onSurface,
+              inactiveTrackColor: theme.colorScheme.surfaceContainerHighest,
             ),
           ],
         ),

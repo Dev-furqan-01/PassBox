@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/core.dart';
 import '../../../core/services/admob_service.dart';
+import '../../../core/services/password_history_service.dart';
 import 'models/password_config.dart';
 import 'widgets/password_hero_card.dart';
 import 'widgets/password_config_section.dart';
@@ -23,6 +24,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
   bool _isMasked = false;
   final List<PasswordHistoryEntry> _history = [];
   final _adMobService = AdMobService();
+  final _historyService = PasswordHistoryService();
   Timer? _bannerRefreshTimer;
 
   @override
@@ -30,15 +32,26 @@ class _GenerateScreenState extends State<GenerateScreen> {
     super.initState();
     _config = const PasswordConfig();
     _generatePassword();
-    // Load banner ad
-    _adMobService.loadBannerAd();
-    // Refresh banner every 60 seconds
-    _startBannerRefreshTimer();
+    _loadHistory();
+    // Load banner ad (platform-specific)
+    try {
+      _adMobService.loadBannerAd();
+      // Refresh banner every 60 seconds
+      _startBannerRefreshTimer();
+    } catch (e) {
+      // AdMob not available on this platform (e.g., web)
+      print('AdMob not available: $e');
+    }
   }
 
   void _startBannerRefreshTimer() {
     _bannerRefreshTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
-      _adMobService.loadBannerAd();
+      try {
+        _adMobService.loadBannerAd();
+      } catch (e) {
+        // Silently fail on Ad refresh errors
+        print('AdMob refresh failed: $e');
+      }
     });
   }
 
@@ -103,21 +116,22 @@ class _GenerateScreenState extends State<GenerateScreen> {
 
   void _copyToClipboard() {
     Clipboard.setData(ClipboardData(text: _currentPassword));
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle, color: AppColors.secondary),
+            Icon(Icons.check_circle, color: theme.colorScheme.secondary),
             const SizedBox(width: 8),
             Text(
               'Copied to Clipboard',
               style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onSurface,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ],
         ),
-        backgroundColor: AppColors.surfaceBright,
+        backgroundColor: theme.colorScheme.surface,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(milliseconds: 1500),
       ),
@@ -137,9 +151,30 @@ class _GenerateScreenState extends State<GenerateScreen> {
         _history.removeLast();
       }
     });
+
+    // Save to Firestore
+    _historyService.savePasswordHistory(entry);
+  }
+
+  Future<void> _loadHistory() async {
+    final history = await _historyService.loadPasswordHistory();
+    if (mounted) {
+      setState(() {
+        _history.clear();
+        _history.addAll(history);
+      });
+    }
+  }
+
+  Future<void> _clearHistory() async {
+    setState(() {
+      _history.clear();
+    });
+    await _historyService.clearPasswordHistory();
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -149,12 +184,12 @@ class _GenerateScreenState extends State<GenerateScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.lock,
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 size: 18,
               ),
             ),
@@ -167,7 +202,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
                     Text(
                       'PassBox',
                       style: AppTextStyles.headlineSm.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -177,7 +212,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withOpacity(0.1),
+                        color: theme.colorScheme.secondary.withOpacity(0.1),
                         borderRadius: AppBorderRadius.fullRadius,
                       ),
                       child: Row(
@@ -185,8 +220,8 @@ class _GenerateScreenState extends State<GenerateScreen> {
                           Container(
                             width: 6,
                             height: 6,
-                            decoration: const BoxDecoration(
-                              color: AppColors.secondary,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.secondary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -194,7 +229,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
                           Text(
                             'Locked',
                             style: AppTextStyles.labelBadge.copyWith(
-                              color: AppColors.secondary,
+                              color: theme.colorScheme.secondary,
                             ),
                           ),
                         ],
@@ -205,7 +240,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
                 Text(
                   'Generator',
                   style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -218,9 +253,9 @@ class _GenerateScreenState extends State<GenerateScreen> {
               onPressed: () {
                 // TODO: Implement sync
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.sync,
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(width: 4),
@@ -228,12 +263,12 @@ class _GenerateScreenState extends State<GenerateScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person,
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 size: 18,
               ),
             ),
@@ -244,6 +279,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
   }
 
   Widget _buildPresetChips() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -253,7 +289,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
             Text(
               'Security Architecture Mode',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
                 letterSpacing: 0.1,
               ),
             ),
@@ -263,7 +299,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.1),
+                color: theme.colorScheme.secondary.withOpacity(0.1),
                 borderRadius: AppBorderRadius.fullRadius,
               ),
               child: Row(
@@ -271,8 +307,8 @@ class _GenerateScreenState extends State<GenerateScreen> {
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: const BoxDecoration(
-                      color: AppColors.secondary,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.secondary,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -280,7 +316,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
                   Text(
                     'PRNG ACTIVE',
                     style: AppTextStyles.labelBadge.copyWith(
-                      color: AppColors.secondary,
+                      color: theme.colorScheme.secondary,
                     ),
                   ),
                 ],
@@ -336,12 +372,12 @@ class _GenerateScreenState extends State<GenerateScreen> {
               const SizedBox(width: 4),
               _PresetChip(
                 icon: Icons.pin,
-                label: 'PIN Code (6-digit)',
+                label: 'PIN Code (8-digit)',
                 isSelected: _isPinPreset(),
                 onTap: () {
                   setState(() {
                     _config = const PasswordConfig(
-                      length: 6,
+                      length: 8,
                       includeUppercase: false,
                       includeLowercase: false,
                       includeNumbers: true,
@@ -420,8 +456,9 @@ class _GenerateScreenState extends State<GenerateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -480,22 +517,23 @@ class _GenerateScreenState extends State<GenerateScreen> {
                             SnackBar(
                               content: Row(
                                 children: [
-                                  const Icon(Icons.check_circle, color: AppColors.secondary),
+                                  Icon(Icons.check_circle, color: theme.colorScheme.secondary),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Copied to Clipboard',
                                     style: AppTextStyles.bodyMd.copyWith(
-                                      color: AppColors.onSurface,
+                                      color: theme.colorScheme.onSurface,
                                     ),
                                   ),
                                 ],
                               ),
-                              backgroundColor: AppColors.surfaceBright,
+                              backgroundColor: theme.colorScheme.surface,
                               behavior: SnackBarBehavior.floating,
                               duration: const Duration(milliseconds: 1500),
                             ),
                           );
                         },
+                        onClearHistory: _clearHistory,
                       ),
                     const SizedBox(height: AppSpacing.spaceXl),
                   ],
@@ -530,6 +568,7 @@ class _PresetChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -539,8 +578,8 @@ class _PresetChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryContainer
-              : AppColors.surfaceContainer,
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.fullRadius,
           boxShadow: isSelected
               ? [
@@ -559,16 +598,16 @@ class _PresetChip extends StatelessWidget {
               icon,
               size: 14,
               color: isSelected
-                  ? AppColors.onPrimaryContainer
-                  : AppColors.onSurfaceVariant,
+                  ? theme.colorScheme.onPrimaryContainer
+                  : theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 6),
             Text(
               label,
               style: AppTextStyles.labelBadge.copyWith(
                 color: isSelected
-                    ? AppColors.onPrimaryContainer
-                    : AppColors.onSurfaceVariant,
+                    ? theme.colorScheme.onPrimaryContainer
+                    : theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],

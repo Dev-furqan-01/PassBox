@@ -14,6 +14,7 @@ class UrgentActionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,7 +26,7 @@ class UrgentActionsSection extends StatelessWidget {
                 Text(
                   'Urgent Actions',
                   style: AppTextStyles.headlineSm.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -35,13 +36,13 @@ class UrgentActionsSection extends StatelessWidget {
                     vertical: 1,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.errorContainer,
+                    color: theme.colorScheme.errorContainer,
                     borderRadius: AppBorderRadius.fullRadius,
                   ),
                   child: Text(
                     actions.length.toString(),
                     style: AppTextStyles.labelBadge.copyWith(
-                      color: AppColors.error,
+                      color: theme.colorScheme.error,
                     ),
                   ),
                 ),
@@ -50,7 +51,7 @@ class UrgentActionsSection extends StatelessWidget {
             Text(
               'PRIORITY QUEUE',
               style: AppTextStyles.labelCodeMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -76,25 +77,26 @@ class _UrgentActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     Color iconColor;
     Color badgeColor;
 
     switch (action.badgeType) {
       case 'error':
-        iconColor = AppColors.error;
-        badgeColor = AppColors.error;
+        iconColor = theme.colorScheme.error;
+        badgeColor = theme.colorScheme.error;
         break;
       case 'tertiary':
-        iconColor = AppColors.tertiary;
-        badgeColor = AppColors.tertiary;
+        iconColor = theme.colorScheme.tertiary;
+        badgeColor = theme.colorScheme.tertiary;
         break;
       case 'primary':
-        iconColor = AppColors.primary;
-        badgeColor = AppColors.primary;
+        iconColor = theme.colorScheme.primary;
+        badgeColor = theme.colorScheme.primary;
         break;
       default:
-        iconColor = AppColors.onSurface;
-        badgeColor = AppColors.onSurface;
+        iconColor = theme.colorScheme.onSurface;
+        badgeColor = theme.colorScheme.onSurface;
     }
 
     IconData icon;
@@ -116,8 +118,8 @@ class _UrgentActionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.spaceXs),
       decoration: BoxDecoration(
         color: action.badgeType == 'error'
-            ? AppColors.surfaceContainerHigh
-            : AppColors.surfaceContainer,
+            ? theme.colorScheme.surfaceContainerHigh
+            : theme.colorScheme.surfaceContainer,
         borderRadius: AppBorderRadius.lgRadius,
         boxShadow: action.badgeType == 'error' ? AppShadows.cardElevation : null,
       ),
@@ -132,7 +134,7 @@ class _UrgentActionCard extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHighest,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: AppBorderRadius.smRadius,
                 ),
                 child: Icon(
@@ -152,7 +154,7 @@ class _UrgentActionCard extends StatelessWidget {
                           child: Text(
                             action.title,
                             style: AppTextStyles.headlineSm.copyWith(
-                              color: AppColors.onSurface,
+                              color: theme.colorScheme.onSurface,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -180,7 +182,7 @@ class _UrgentActionCard extends StatelessWidget {
                     Text(
                       action.description,
                       style: AppTextStyles.bodySm.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -189,13 +191,14 @@ class _UrgentActionCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 2),
-          _buildActionButtons(action),
+          _buildActionButtons(context, action),
         ],
       ),
     );
   }
 
-  Widget _buildActionButtons(UrgentAction action) {
+  Widget _buildActionButtons(BuildContext context, UrgentAction action) {
+    final theme = Theme.of(context);
     switch (action.actionType) {
       case 'auto-change':
         return Row(
@@ -226,7 +229,7 @@ class _UrgentActionCard extends StatelessWidget {
             Text(
               'Key ID: ${action.keyId}',
               style: AppTextStyles.labelCodeMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             _ActionButton(
@@ -249,8 +252,8 @@ class _UrgentActionCard extends StatelessWidget {
                 Container(
                   width: 6,
                   height: 6,
-                  decoration: const BoxDecoration(
-                    color: AppColors.secondary,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.secondary,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -258,7 +261,7 @@ class _UrgentActionCard extends StatelessWidget {
                 Text(
                   'Zero-Knowledge',
                   style: AppTextStyles.labelCodeMd.copyWith(
-                    color: AppColors.secondary,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
               ],
@@ -291,13 +294,14 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: icon != null ? 36 : 32,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHighest,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
         child: Row(
@@ -306,7 +310,7 @@ class _ActionButton extends StatelessWidget {
             if (icon != null) ...[
               Icon(
                 icon,
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 size: 16,
               ),
               const SizedBox(width: 4),
@@ -314,7 +318,7 @@ class _ActionButton extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.headlineSm.copyWith(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
               ),
             ),
           ],

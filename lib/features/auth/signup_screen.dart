@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import 'auth_service.dart';
 import 'verification_screen.dart';
+import 'login_screen_responsive.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -52,12 +53,13 @@ class _SignupScreenState extends State<SignupScreen> {
 
       print('Signup successful');
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Account created! Please verify your email.',
             ),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: theme.colorScheme.secondary,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -73,10 +75,11 @@ class _SignupScreenState extends State<SignupScreen> {
     } catch (e) {
       print('Signup error: $e');
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -89,8 +92,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.margin),
@@ -124,9 +128,10 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _buildHeader() {
     final screenWidth = MediaQuery.of(context).size.width;
     final logoSize = screenWidth * 0.35; // 35% of screen width
+    final theme = Theme.of(context);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Center(
           child: Container(
@@ -135,7 +140,7 @@ class _SignupScreenState extends State<SignupScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 width: 3,
               ),
             ),
@@ -154,14 +159,15 @@ class _SignupScreenState extends State<SignupScreen> {
         Text(
           'Create Account',
           style: AppTextStyles.headlineLg.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceSm),
         Text(
           'Sign up to start managing your passwords securely',
+          textAlign: TextAlign.center,
           style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -169,22 +175,23 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildNameField() {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _nameController,
       keyboardType: TextInputType.name,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Name',
         hintText: 'Enter your name',
         prefixIcon: const Icon(Icons.person_outlined),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -195,15 +202,15 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -219,22 +226,23 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildEmailField() {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Email',
         hintText: 'Enter your email',
         prefixIcon: const Icon(Icons.email_outlined),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -245,15 +253,15 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -269,10 +277,11 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildPasswordField() {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _passwordController,
       obscureText: _obscurePassword,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Password',
         hintText: 'Create a password',
@@ -286,13 +295,13 @@ class _SignupScreenState extends State<SignupScreen> {
           },
         ),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -303,15 +312,15 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -327,10 +336,11 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildConfirmPasswordField() {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _confirmPasswordController,
       obscureText: _obscureConfirmPassword,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Confirm Password',
         hintText: 'Confirm your password',
@@ -344,13 +354,13 @@ class _SignupScreenState extends State<SignupScreen> {
           },
         ),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -361,15 +371,15 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -385,11 +395,12 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildSignupButton() {
+    final theme = Theme.of(context);
     return ElevatedButton(
       onPressed: _isLoading ? null : _handleSignup,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.onPrimary,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
         shape: RoundedRectangleBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
@@ -397,18 +408,18 @@ class _SignupScreenState extends State<SignupScreen> {
         elevation: 0,
       ),
       child: _isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 20,
               width: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
+                valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.onPrimary),
               ),
             )
           : Text(
               'Create Account',
               style: AppTextStyles.bodyLg.copyWith(
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -416,21 +427,25 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildLoginLink() {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           'Already have an account? ',
           style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         GestureDetector(
-          onTap: () => Navigator.pop(context),
+          onTap: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ResponsiveLoginScreen()),
+          ),
           child: Text(
             'Sign In',
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
           ),

@@ -37,10 +37,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           _emailSent = true;
         });
 
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Password reset email sent! Check your inbox.'),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: theme.colorScheme.secondary,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -48,10 +49,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -61,13 +63,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: theme.colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onSurface),
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -100,34 +103,36 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withOpacity(0.1),
             borderRadius: AppBorderRadius.defaultRadiusBorder,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.lock_reset,
             size: 40,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceXl),
         Text(
           'Forgot Password?',
           style: AppTextStyles.headlineLg.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceSm),
         Text(
           'Enter your email address and we\'ll send you a link to reset your password.',
+          textAlign: TextAlign.center,
           style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -135,22 +140,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildEmailField() {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Email',
         hintText: 'Enter your email',
         prefixIcon: const Icon(Icons.email_outlined),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -161,15 +167,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -185,11 +191,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildResetButton() {
+    final theme = Theme.of(context);
     return ElevatedButton(
       onPressed: _isLoading ? null : _handleResetPassword,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.onPrimary,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
         shape: RoundedRectangleBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
@@ -197,18 +204,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         elevation: 0,
       ),
       child: _isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 20,
               width: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
+                valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.onPrimary),
               ),
             )
           : Text(
               'Send Reset Link',
               style: AppTextStyles.bodyLg.copyWith(
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -216,25 +223,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildSuccessMessage() {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.spaceLg),
       decoration: BoxDecoration(
-        color: AppColors.secondary.withOpacity(0.1),
+        color: theme.colorScheme.secondary.withOpacity(0.1),
         borderRadius: AppBorderRadius.defaultRadiusBorder,
-        border: Border.all(color: AppColors.secondary),
+        border: Border.all(color: theme.colorScheme.secondary),
       ),
       child: Column(
         children: [
-          const Icon(
+          Icon(
             Icons.check_circle,
             size: 64,
-            color: AppColors.secondary,
+            color: theme.colorScheme.secondary,
           ),
           const SizedBox(height: AppSpacing.spaceMd),
           Text(
             'Email Sent!',
             style: AppTextStyles.headlineSm.copyWith(
-              color: AppColors.onSurface,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: AppSpacing.spaceSm),
@@ -242,7 +250,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             'We\'ve sent a password reset link to your email. Please check your inbox and follow the instructions.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -251,11 +259,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildBackToLoginButton() {
+    final theme = Theme.of(context);
     return ElevatedButton(
       onPressed: () => Navigator.pop(context),
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.surfaceContainer,
-        foregroundColor: AppColors.onSurface,
+        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+        foregroundColor: theme.colorScheme.onSurface,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
         shape: RoundedRectangleBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
@@ -265,7 +274,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: Text(
         'Back to Login',
         style: AppTextStyles.bodyLg.copyWith(
-          color: AppColors.onSurface,
+          color: theme.colorScheme.onSurface,
           fontWeight: FontWeight.w600,
         ),
       ),

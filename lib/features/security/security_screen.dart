@@ -231,83 +231,99 @@ class _SecurityScreenState extends State<SecurityScreen> {
       for (final vault in weakVaults) {
         final confirmed = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Update Weak Password'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Service: ${vault.service}',
-                  style: AppTextStyles.headlineSm.copyWith(
-                    color: AppColors.onSurface,
-                  ),
+          builder: (context) {
+            final theme = Theme.of(context);
+            return AlertDialog(
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              title: Text(
+                'Update Weak Password',
+                style: AppTextStyles.headlineSm.copyWith(
+                  color: theme.colorScheme.onSurface,
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Current Password (Weak):',
-                  style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Service: ${vault.service}',
+                    style: AppTextStyles.headlineSm.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-                SizedBox(height: 4),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainer,
-                    borderRadius: AppBorderRadius.defaultRadiusBorder,
+                  SizedBox(height: 8),
+                  Text(
+                    'Current Password (Weak):',
+                    style: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
+                  SizedBox(height: 4),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainer,
+                      borderRadius: AppBorderRadius.defaultRadiusBorder,
+                    ),
+                    child: Text(
+                      vault.password,
+                      style: AppTextStyles.labelCodeMd.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Generated Strong Password:',
+                    style: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainer,
+                      borderRadius: AppBorderRadius.defaultRadiusBorder,
+                    ),
+                    child: Text(
+                      _generateStrongPassword(),
+                      style: AppTextStyles.labelCodeMd.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Do you want to update this password?',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
                   child: Text(
-                    vault.password,
-                    style: AppTextStyles.labelCodeMd.copyWith(
-                      color: AppColors.error,
+                    'Skip',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
-                Text(
-                  'Generated Strong Password:',
-                  style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainer,
-                    borderRadius: AppBorderRadius.defaultRadiusBorder,
-                  ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
                   child: Text(
-                    _generateStrongPassword(),
-                    style: AppTextStyles.labelCodeMd.copyWith(
-                      color: AppColors.secondary,
+                    'Update',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: theme.colorScheme.primary,
                     ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Do you want to update this password?',
-                  style: AppTextStyles.bodyMd.copyWith(
-                    color: AppColors.onSurface,
                   ),
                 ),
               ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text('Skip'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text('Update'),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
 
         if (confirmed == true) {
@@ -317,12 +333,13 @@ class _SecurityScreenState extends State<SecurityScreen> {
             vaultId: vault.vaultId,
             password: newPassword,
           );
-          
+
           if (mounted) {
+            final theme = Theme.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Password updated for ${vault.service}'),
-                backgroundColor: AppColors.secondary,
+                backgroundColor: theme.colorScheme.secondary,
               ),
             );
           }
@@ -334,10 +351,11 @@ class _SecurityScreenState extends State<SecurityScreen> {
     } catch (e) {
       print('Error updating weak passwords: $e');
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update passwords'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -372,83 +390,99 @@ class _SecurityScreenState extends State<SecurityScreen> {
       for (final vault in reusedVaults) {
         final confirmed = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Update Reused Password'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Service: ${vault.service}',
-                  style: AppTextStyles.headlineSm.copyWith(
-                    color: AppColors.onSurface,
-                  ),
+          builder: (context) {
+            final theme = Theme.of(context);
+            return AlertDialog(
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              title: Text(
+                'Update Reused Password',
+                style: AppTextStyles.headlineSm.copyWith(
+                  color: theme.colorScheme.onSurface,
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Current Password (Reused):',
-                  style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Service: ${vault.service}',
+                    style: AppTextStyles.headlineSm.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-                SizedBox(height: 4),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainer,
-                    borderRadius: AppBorderRadius.defaultRadiusBorder,
+                  SizedBox(height: 8),
+                  Text(
+                    'Current Password (Reused):',
+                    style: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
+                  SizedBox(height: 4),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainer,
+                      borderRadius: AppBorderRadius.defaultRadiusBorder,
+                    ),
+                    child: Text(
+                      vault.password,
+                      style: AppTextStyles.labelCodeMd.copyWith(
+                        color: theme.colorScheme.tertiary,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Generated Unique Password:',
+                    style: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainer,
+                      borderRadius: AppBorderRadius.defaultRadiusBorder,
+                    ),
+                    child: Text(
+                      _generateStrongPassword(),
+                      style: AppTextStyles.labelCodeMd.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Do you want to update this password?',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
                   child: Text(
-                    vault.password,
-                    style: AppTextStyles.labelCodeMd.copyWith(
-                      color: AppColors.tertiary,
+                    'Skip',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
-                Text(
-                  'Generated Unique Password:',
-                  style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainer,
-                    borderRadius: AppBorderRadius.defaultRadiusBorder,
-                  ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
                   child: Text(
-                    _generateStrongPassword(),
-                    style: AppTextStyles.labelCodeMd.copyWith(
-                      color: AppColors.secondary,
+                    'Update',
+                    style: AppTextStyles.bodyMd.copyWith(
+                      color: theme.colorScheme.primary,
                     ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Do you want to update this password?',
-                  style: AppTextStyles.bodyMd.copyWith(
-                    color: AppColors.onSurface,
                   ),
                 ),
               ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text('Skip'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text('Update'),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
 
         if (confirmed == true) {
@@ -458,12 +492,13 @@ class _SecurityScreenState extends State<SecurityScreen> {
             vaultId: vault.vaultId,
             password: newPassword,
           );
-          
+
           if (mounted) {
+            final theme = Theme.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Password updated for ${vault.service}'),
-                backgroundColor: AppColors.secondary,
+                backgroundColor: theme.colorScheme.secondary,
               ),
             );
           }
@@ -475,10 +510,11 @@ class _SecurityScreenState extends State<SecurityScreen> {
     } catch (e) {
       print('Error updating reused passwords: $e');
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update passwords'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -487,8 +523,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -497,7 +534,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(),
+                    _buildHeader(context),
                     const SizedBox(height: AppSpacing.spaceSm),
                     SecurityScoreCard(
                       metrics: _metrics,
@@ -524,7 +561,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -534,12 +572,12 @@ class _SecurityScreenState extends State<SecurityScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.lock,
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 size: 18,
               ),
             ),
@@ -552,7 +590,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                     Text(
                       'PassBox',
                       style: AppTextStyles.headlineSm.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -562,7 +600,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withOpacity(0.1),
+                        color: theme.colorScheme.secondary.withOpacity(0.1),
                         borderRadius: AppBorderRadius.fullRadius,
                       ),
                       child: Row(
@@ -570,8 +608,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
                           Container(
                             width: 6,
                             height: 6,
-                            decoration: const BoxDecoration(
-                              color: AppColors.secondary,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.secondary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -579,7 +617,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                           Text(
                             'Locked',
                             style: AppTextStyles.labelBadge.copyWith(
-                              color: AppColors.secondary,
+                              color: theme.colorScheme.secondary,
                             ),
                           ),
                         ],
@@ -590,7 +628,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 Text(
                   'Security Center',
                   style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -603,9 +641,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
               onPressed: () {
                 // TODO: Implement sync
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.sync,
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(width: 4),
@@ -613,12 +651,12 @@ class _SecurityScreenState extends State<SecurityScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person,
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 size: 18,
               ),
             ),

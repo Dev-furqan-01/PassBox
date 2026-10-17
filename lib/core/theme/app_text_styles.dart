@@ -71,6 +71,14 @@ class AppTextStyles {
     letterSpacing: 0.08,
   );
 
+  static const TextStyle labelCodeXl = TextStyle(
+    fontFamily: 'JetBrains Mono',
+    fontSize: 20,
+    fontWeight: FontWeight.w500,
+    height: 24 / 20,
+    letterSpacing: 0.1,
+  );
+
   static const TextStyle labelCodeMd = TextStyle(
     fontFamily: 'JetBrains Mono',
     fontSize: 13,

@@ -49,6 +49,10 @@ flutter pub get
 ```
 lib/
 ├── core/                    # Core utilities (theme, constants, etc.)
+│   ├── constants/          # App constants (spacing, borders, etc.)
+│   ├── services/           # Shared services (admob, theme, password history)
+│   ├── styles/             # App styles (shadows, text styles)
+│   └── theme/              # App theme (colors, fonts, themes)
 ├── features/
 │   ├── auth/               # Authentication flow
 │   │   ├── auth.dart       # Auth barrel file
@@ -59,8 +63,23 @@ lib/
 │   │   └── models/
 │   │       └── user_model.dart
 │   ├── security/           # Security features
+│   │   ├── security.dart  # Security barrel file
+│   │   ├── security_screen.dart  # Mobile security screen
+│   │   ├── security_screen_responsive.dart  # Responsive wrapper
+│   │   ├── web/            # Web/desktop security components
+│   │   │   ├── security_screen_web.dart
+│   │   │   └── components/
+│   │   │       ├── web_header_banner.dart
+│   │   │       ├── web_critical_issues_card.dart
+│   │   │       ├── web_reused_passwords_card.dart
+│   │   │       ├── web_dark_web_alerts_card.dart
+│   │   │       ├── web_2fa_disabled_card.dart
+│   │   │       ├── web_strength_overview_card.dart
+│   │   │       └── web_recommended_actions_card.dart
+│   │   ├── widgets/        # Mobile security widgets
 │   │   └── models/
-│   │       └── security_event.dart
+│   │       ├── security_event.dart
+│   │       └── security_metrics.dart
 │   ├── vault/              # Password vault
 │   ├── items/              # Password items
 │   ├── generate/          # Password generator
@@ -114,6 +133,14 @@ valut (collection)
           │   ├── isEmailVerified: boolean
           │   ├── createdAt: timestamp
           │   └── updatedAt: timestamp
+          ├── password_history (document)
+          │   └── entries (collection)
+          │       └── {entryId} (document)
+          │           ├── entryId: string
+          │           ├── password: string
+          │           ├── generatedAt: timestamp
+          │           ├── entropy: int
+          │           └── createdAt: timestamp
           └── security_events (collection)
               └── events (collection)
                   └── {eventId} (document)
@@ -142,6 +169,37 @@ valut (collection)
 - All auth operations log security events to Firestore
 - Security events are tracked for audit purposes
 - Biometric authentication is available via local_auth
+
+### Security Screen
+- Responsive design with separate layouts for mobile (< 768px) and desktop/tablet (>= 768px)
+- Mobile: Vertical layout with score card, metrics grid, urgent actions, and encryption banner
+- Desktop/Tablet: Modern grid dashboard layout with shared sidebar
+  - Left sidebar (80px): Shared navigation component with dark teal icons
+  - Top header banner: Soft teal gradient with security status and score
+  - Multi-card grid: Critical issues, reused passwords, dark web alerts, 2FA disabled, strength overview, recommended actions
+- Security score calculation: Average password strength - (weak passwords × 5) - (reused passwords × 3)
+- Grade system: A (90+), A- (80-89), B (70-79), C (60-69), D (50-59), F (<50)
+- Urgent actions: Weak passwords and reused passwords trigger actionable cards
+- Keyboard shortcut: Cmd/Ctrl + R triggers security audit on web/desktop
+- Dialog constraints: Web dialogs are centered with max-width 480px for optimal desktop experience
+- Hover states: Action cards, metrics, and buttons have hover effects on web/desktop
+
+### Shared Components
+- **SharedSidebar**: Reusable sidebar navigation component for desktop/web layouts
+  - Located in `lib/core/widgets/shared_sidebar.dart`
+  - Used across all screens for consistent navigation
+  - Features: Dark teal (#0D7377) active state, light grey (#E8ECF1) background, 80px width
+  - Navigation items: Vault, Passwords, Sync, Security, Settings
+  - Active indicator with teal pill highlight
+  - Exported through `lib/core/widgets/widgets.dart` and `lib/core/core.dart`
+
+### Password History
+- Password generation history is saved to Firestore under `valut/user/{uid}/password_history/entries`
+- History is limited to the last 50 entries in Firestore (automatic cleanup)
+- History is limited to the last 10 entries displayed in the UI
+- History is loaded from Firestore when the generate screen initializes
+- Users can clear their password history from the UI
+- PasswordHistoryService handles all Firestore operations for password history
 
 ### Theme
 - App uses a dark theme by default

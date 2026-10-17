@@ -13,14 +13,15 @@ class QuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Expanded(
           child: _QuickActionButton(
             icon: Icons.add,
             label: 'NEW ITEM',
-            backgroundColor: AppColors.primaryContainer,
-            textColor: AppColors.onPrimaryContainer,
+            backgroundColor: theme.colorScheme.primaryContainer,
+            textColor: theme.colorScheme.onPrimaryContainer,
             onTap: onNewItem,
             isFilled: true,
           ),
@@ -30,9 +31,9 @@ class QuickActions extends StatelessWidget {
           child: _QuickActionButton(
             icon: Icons.vpn_key,
             label: 'GENERATE',
-            backgroundColor: AppColors.surfaceContainer,
-            textColor: AppColors.onSurface,
-            iconColor: AppColors.primary,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+            textColor: theme.colorScheme.onSurface,
+            iconColor: theme.colorScheme.primary,
             onTap: onGenerate,
           ),
         ),

@@ -1,15 +1,20 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'core/core.dart';
 import 'core/services/admob_service.dart';
+import 'core/services/theme_service.dart';
 import 'features/vault/vault.dart';
+import 'features/vault/vault_screen_responsive.dart';
 import 'features/items/items.dart';
-import 'features/generate/generate.dart';
+import 'features/items/items_screen_responsive.dart';
+import 'features/generate/generate_screen_responsive.dart';
 import 'features/security/security.dart';
 import 'features/settings/settings.dart';
 import 'features/auth/auth.dart';
+import 'features/auth/login_screen_responsive.dart';
 import 'splash_screen.dart';
 import 'firebase_options.dart';
 
@@ -18,6 +23,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Initialize Theme Service
+  await ThemeService.instance.init();
   // Initialize AdMob
   await AdMobService().initialize();
   // Preload interstitial and banner ads
@@ -26,8 +33,29 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    ThemeService.instance.addListener(_onThemeChanged);
+  }
+
+  @override
+  void dispose() {
+    ThemeService.instance.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +64,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
+        '/login': (context) => const ResponsiveLoginScreen(),
         '/main': (context) => const MainScreen(),
       },
     );
@@ -59,10 +87,10 @@ class _MainScreenState extends State<MainScreen> {
   bool _isLoading = false;
 
   final List<Widget> _screens = [
-    const VaultScreen(),
-    const ItemsScreen(),
-    const GenerateScreen(),
-    const SecurityScreen(),
+    const VaultScreenResponsive(),
+    const ItemsScreenResponsive(),
+    const GenerateScreenResponsive(),
+    const SecurityScreenResponsive(),
     const SettingsScreen(),
   ];
 
@@ -90,16 +118,150 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  bool get _isDesktopOrWeb {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth >= 1024 || kIsWeb;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          _screens[_currentIndex],
-          if (_isLoading) _buildLoadingOverlay(),
+          _isDesktopOrWeb
+              ? Row(
+                  children: [
+                    // Side Navigation Rail for desktop/web
+                    _buildSideNavigationRail(),
+                    // Main Content
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          _screens[_currentIndex],
+                          if (_isLoading) _buildLoadingOverlay(),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Stack(
+                  children: [
+                    _screens[_currentIndex],
+                    if (_isLoading) _buildLoadingOverlay(),
+                  ],
+                ),
         ],
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      bottomNavigationBar: _isDesktopOrWeb ? null : _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildSideNavigationRail() {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: 72,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(
+          right: BorderSide(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 16),
+          // Logo
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.lock,
+              color: theme.colorScheme.onPrimary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Navigation Items
+          Expanded(
+            child: Column(
+              children: [
+                for (int i = 0; i < _navItems.length; i++)
+                  _buildSideNavItem(
+                    icon: _navItems[i].icon,
+                    label: _navItems[i].label,
+                    index: i,
+                    hasNotification: _navItems[i].hasNotification,
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSideNavItem({
+    required IconData icon,
+    required String label,
+    required int index,
+    bool hasNotification = false,
+  }) {
+    final isSelected = _currentIndex == index;
+    final theme = Theme.of(context);
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _handleTabTap(index),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : Colors.transparent,
+              width: 2,
+            ),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurfaceVariant,
+                size: 24,
+              ),
+              if (hasNotification)
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.tertiary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -107,7 +269,7 @@ class _MainScreenState extends State<MainScreen> {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
       child: Container(
-        color: AppColors.background.withOpacity(0.3),
+        color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.3),
         child: Center(
           child: SizedBox(
             width: 90,
@@ -121,8 +283,8 @@ class _MainScreenState extends State<MainScreen> {
                   height: 85,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                    backgroundColor: AppColors.primary.withOpacity(0.2),
+                    valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                   ),
                 ),
                 // Logo in the center (inside the spinner)
@@ -143,7 +305,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildBottomNavigationBar() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface.withOpacity(0.9),
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.35),
@@ -182,6 +344,7 @@ class _MainScreenState extends State<MainScreen> {
     bool hasNotification = false,
   }) {
     final isSelected = _currentIndex == index;
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () => _handleTabTap(index),
@@ -192,13 +355,13 @@ class _MainScreenState extends State<MainScreen> {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.surfaceContainerHigh
+              ? theme.colorScheme.surfaceContainerHighest
               : Colors.transparent,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.25),
+                    color: theme.colorScheme.primary.withOpacity(0.25),
                     blurRadius: 12,
                     spreadRadius: 0,
                   ),
@@ -213,8 +376,8 @@ class _MainScreenState extends State<MainScreen> {
                 Icon(
                   icon,
                   color: isSelected
-                      ? AppColors.primaryContainer
-                      : AppColors.onSurfaceVariant,
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
                   size: 22,
                 ),
                 const SizedBox(height: 2),
@@ -222,8 +385,8 @@ class _MainScreenState extends State<MainScreen> {
                   label,
                   style: AppTextStyles.labelBadge.copyWith(
                     color: isSelected
-                        ? AppColors.primaryContainer
-                        : AppColors.onSurfaceVariant,
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurfaceVariant,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
@@ -236,8 +399,8 @@ class _MainScreenState extends State<MainScreen> {
                 child: Container(
                   width: 8,
                   height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.tertiary,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.tertiary,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -268,6 +431,7 @@ class PlaceholderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -275,20 +439,20 @@ class PlaceholderScreen extends StatelessWidget {
           Icon(
             Icons.construction,
             size: 64,
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
           const SizedBox(height: AppSpacing.spaceMd),
           Text(
             '$title Screen',
             style: AppTextStyles.headlineLg.copyWith(
-              color: AppColors.onSurface,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: AppSpacing.spaceSm),
           Text(
             'Coming Soon',
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],

@@ -120,6 +120,41 @@ class VaultService {
     }
   }
 
+  Future<List<Vault>> searchVaults(String query) async {
+    try {
+      final userId = currentUserId;
+      if (userId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      final snapshot = await _firestore
+          .collection('valut')
+          .doc('user')
+          .collection(userId)
+          .doc('vaults')
+          .collection('items')
+          .get();
+
+      final allVaults = snapshot.docs
+          .map((doc) => Vault.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      if (query.isEmpty) {
+        return allVaults;
+      }
+
+      final lowerQuery = query.toLowerCase();
+
+      return allVaults.where((vault) {
+        return vault.service.toLowerCase().contains(lowerQuery) ||
+               vault.username.toLowerCase().contains(lowerQuery) ||
+               vault.category.toLowerCase().contains(lowerQuery);
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to search vaults: $e');
+    }
+  }
+
   Stream<List<Vault>> watchVaults() {
     final userId = currentUserId;
     if (userId == null) {

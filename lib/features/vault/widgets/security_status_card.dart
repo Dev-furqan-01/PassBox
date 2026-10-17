@@ -21,9 +21,10 @@ class SecurityStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.defaultRadiusBorder,
         boxShadow: AppShadows.cardElevation,
       ),
@@ -36,11 +37,11 @@ class SecurityStatusCard extends StatelessWidget {
               width: 128,
               height: 128,
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.05),
+                color: theme.colorScheme.secondary.withOpacity(0.05),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.secondary.withOpacity(0.1),
+                    color: theme.colorScheme.secondary.withOpacity(0.1),
                     blurRadius: 64,
                     spreadRadius: 32,
                   ),
@@ -65,7 +66,7 @@ class SecurityStatusCard extends StatelessWidget {
                               Text(
                                 'Vault Health',
                                 style: AppTextStyles.headlineSm.copyWith(
-                                  color: AppColors.onSurface,
+                                  color: theme.colorScheme.onSurface,
                                 ),
                               ),
                               const SizedBox(width: 6),
@@ -75,13 +76,13 @@ class SecurityStatusCard extends StatelessWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.secondaryContainer.withOpacity(0.2),
+                                  color: theme.colorScheme.primaryContainer.withOpacity(0.2),
                                   borderRadius: AppBorderRadius.fullRadius,
                                 ),
                                 child: Text(
                                   healthStatus.toUpperCase(),
                                   style: AppTextStyles.labelBadge.copyWith(
-                                    color: AppColors.secondary,
+                                    color: theme.colorScheme.secondary,
                                   ),
                                 ),
                               ),
@@ -91,7 +92,7 @@ class SecurityStatusCard extends StatelessWidget {
                           Text(
                             'Last scanned $lastScanTime ago',
                             style: AppTextStyles.bodySm.copyWith(
-                              color: AppColors.onSurfaceVariant,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -103,7 +104,7 @@ class SecurityStatusCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerLow,
+                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
                     borderRadius: AppBorderRadius.defaultRadiusBorder,
                   ),
                   child: Row(
@@ -112,7 +113,7 @@ class SecurityStatusCard extends StatelessWidget {
                         child: _MetricChip(
                           value: totalItems.toString(),
                           label: 'TOTAL',
-                          color: AppColors.onSurface,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -120,13 +121,13 @@ class SecurityStatusCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceContainerHighest.withOpacity(0.4),
+                            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
                             borderRadius: AppBorderRadius.defaultRadiusBorder,
                           ),
                           child: _MetricChip(
                             value: weakPasswords.toString(),
                             label: 'WEAK',
-                            color: AppColors.tertiary,
+                            color: theme.colorScheme.tertiary,
                           ),
                         ),
                       ),
@@ -135,7 +136,7 @@ class SecurityStatusCard extends StatelessWidget {
                         child: _MetricChip(
                           value: reusedPasswords.toString(),
                           label: 'REUSED',
-                          color: AppColors.tertiary,
+                          color: theme.colorScheme.tertiary,
                         ),
                       ),
                     ],
@@ -157,6 +158,7 @@ class _HealthScoreCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       width: 48,
       height: 48,
@@ -168,9 +170,9 @@ class _HealthScoreCircle extends StatelessWidget {
             child: CircularProgressIndicator(
               value: score / 100,
               strokeWidth: 3,
-              backgroundColor: AppColors.surfaceContainerHighest,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.secondary,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                theme.colorScheme.secondary,
               ),
             ),
           ),
@@ -178,7 +180,7 @@ class _HealthScoreCircle extends StatelessWidget {
             child: Text(
               score.toString(),
               style: AppTextStyles.labelCodeMd.copyWith(
-                color: AppColors.secondary,
+                color: theme.colorScheme.secondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -202,6 +204,7 @@ class _MetricChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Text(
@@ -214,7 +217,7 @@ class _MetricChip extends StatelessWidget {
         Text(
           label,
           style: AppTextStyles.labelBadge.copyWith(
-            color: AppColors.outline,
+            color: theme.colorScheme.outline,
           ),
         ),
       ],

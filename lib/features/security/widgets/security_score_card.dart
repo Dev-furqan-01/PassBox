@@ -14,9 +14,10 @@ class SecurityScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: AppBorderRadius.lgRadius,
         boxShadow: AppShadows.cardElevation,
       ),
@@ -30,11 +31,11 @@ class SecurityScoreCard extends StatelessWidget {
               width: 160,
               height: 160,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: theme.colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.2),
+                    color: theme.colorScheme.primary.withOpacity(0.2),
                     blurRadius: 128,
                     spreadRadius: 64,
                   ),
@@ -49,11 +50,11 @@ class SecurityScoreCard extends StatelessWidget {
               width: 144,
               height: 144,
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.1),
+                color: theme.colorScheme.secondary.withOpacity(0.1),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.secondary.withOpacity(0.2),
+                    color: theme.colorScheme.secondary.withOpacity(0.2),
                     blurRadius: 128,
                     spreadRadius: 64,
                   ),
@@ -78,7 +79,7 @@ class SecurityScoreCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.secondaryContainer.withOpacity(0.2),
+                              color: theme.colorScheme.secondaryContainer.withOpacity(0.2),
                               borderRadius: AppBorderRadius.fullRadius,
                             ),
                             child: Row(
@@ -87,8 +88,8 @@ class SecurityScoreCard extends StatelessWidget {
                                 Container(
                                   width: 6,
                                   height: 6,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.secondary,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.secondary,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -96,7 +97,7 @@ class SecurityScoreCard extends StatelessWidget {
                                 Text(
                                   'SHIELD GRADE ${metrics.securityGrade}',
                                   style: AppTextStyles.labelBadge.copyWith(
-                                    color: AppColors.secondary,
+                                    color: theme.colorScheme.secondary,
                                     letterSpacing: 0.1,
                                   ),
                                 ),
@@ -109,7 +110,7 @@ class SecurityScoreCard extends StatelessWidget {
                               Text(
                                 '${metrics.securityScore}%',
                                 style: AppTextStyles.headlineXl.copyWith(
-                                  color: AppColors.onSurface,
+                                  color: theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -117,7 +118,7 @@ class SecurityScoreCard extends StatelessWidget {
                               Text(
                                 metrics.securityStatus,
                                 style: AppTextStyles.labelCodeMd.copyWith(
-                                  color: AppColors.primary,
+                                  color: theme.colorScheme.primary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -127,14 +128,14 @@ class SecurityScoreCard extends StatelessWidget {
                           Text(
                             'Last automated dark web audit: Today, 14:20',
                             style: AppTextStyles.bodySm.copyWith(
-                              color: AppColors.onSurfaceVariant,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(width: AppSpacing.spaceMd),
-                    _buildScoreCircle(),
+                    _buildScoreCircle(context),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.spaceMd),
@@ -144,16 +145,16 @@ class SecurityScoreCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.radar,
-                          color: AppColors.secondary,
+                          color: theme.colorScheme.secondary,
                           size: 16,
                         ),
                         const SizedBox(width: 6),
                         Text(
                           '${metrics.analyzedNodes} Vault Nodes Analyzed',
                           style: AppTextStyles.labelCodeMd.copyWith(
-                            color: AppColors.onSurfaceVariant,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -169,7 +170,8 @@ class SecurityScoreCard extends StatelessWidget {
     );
   }
 
-  Widget _buildScoreCircle() {
+  Widget _buildScoreCircle(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       width: 80,
       height: 80,
@@ -180,16 +182,16 @@ class SecurityScoreCard extends StatelessWidget {
             child: CircularProgressIndicator(
               value: metrics.securityScore / 100,
               strokeWidth: 5.5,
-              backgroundColor: AppColors.surfaceContainerHighest,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.primary,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                theme.colorScheme.primary,
               ),
             ),
           ),
           Center(
             child: Icon(
               Icons.verified_user,
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               size: 24,
             ),
           ),
@@ -206,6 +208,7 @@ class _AuditButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -214,22 +217,22 @@ class _AuditButton extends StatelessWidget {
           vertical: 4,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHighest,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.refresh,
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               size: 14,
             ),
             const SizedBox(width: 4),
             Text(
               'RUN AUDIT',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
               ),
             ),
           ],

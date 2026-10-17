@@ -5,11 +5,13 @@ import '../models/password_config.dart';
 class PasswordHistory extends StatefulWidget {
   final List<PasswordHistoryEntry> history;
   final ValueChanged<String> onCopyFromHistory;
+  final VoidCallback? onClearHistory;
 
   const PasswordHistory({
     super.key,
     required this.history,
     required this.onCopyFromHistory,
+    this.onClearHistory,
   });
 
   @override
@@ -21,9 +23,10 @@ class _PasswordHistoryState extends State<PasswordHistory> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.lgRadius,
         boxShadow: AppShadows.cardElevation,
       ),
@@ -41,32 +44,56 @@ class _PasswordHistoryState extends State<PasswordHistory> {
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.history,
-                      color: AppColors.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Recent Generated History',
                       style: AppTextStyles.headlineSm.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                   ],
                 ),
                 Row(
                   children: [
+                    if (widget.onClearHistory != null && widget.history.isNotEmpty)
+                      GestureDetector(
+                        onTap: widget.onClearHistory,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_outline,
+                                color: theme.colorScheme.error,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Clear',
+                                style: AppTextStyles.labelBadge.copyWith(
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    const SizedBox(width: 6),
                     Text(
                       '${widget.history.length} ITEMS',
                       style: AppTextStyles.labelBadge.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(width: 6),
                     Icon(
                       _isExpanded ? Icons.expand_less : Icons.expand_more,
-                      color: AppColors.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                   ],
@@ -105,10 +132,11 @@ class _HistoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.defaultRadiusBorder,
       ),
       child: Row(
@@ -118,28 +146,28 @@ class _HistoryItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHighlightedPassword(entry.password),
+                _buildHighlightedPassword(context, entry.password),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Text(
                       entry.timeAgo,
                       style: AppTextStyles.bodySm.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '•',
                       style: AppTextStyles.bodySm.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '${entry.entropy} bits',
                       style: AppTextStyles.labelBadge.copyWith(
-                        color: AppColors.secondary,
+                        color: theme.colorScheme.secondary,
                         letterSpacing: 0.1,
                       ),
                     ),
@@ -155,21 +183,21 @@ class _HistoryItem extends StatelessWidget {
               height: 32,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainer,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: AppBorderRadius.smRadius,
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.content_copy,
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     size: 14,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     'Copy',
                     style: AppTextStyles.labelBadge.copyWith(
-                      color: AppColors.onSurface,
+                      color: theme.colorScheme.onSurface,
                       letterSpacing: 0.1,
                     ),
                   ),
@@ -182,18 +210,19 @@ class _HistoryItem extends StatelessWidget {
     );
   }
 
-  Widget _buildHighlightedPassword(String password) {
+  Widget _buildHighlightedPassword(BuildContext context, String password) {
+    final theme = Theme.of(context);
     return Wrap(
       children: password.split('').map((char) {
         Color color;
         if (RegExp(r'[A-Z]').hasMatch(char)) {
-          color = AppColors.onSurface;
+          color = theme.colorScheme.onSurface;
         } else if (RegExp(r'[0-9]').hasMatch(char)) {
-          color = AppColors.tertiary;
+          color = theme.colorScheme.tertiary;
         } else if (RegExp(r'[!@#$%^&*()_+\-=\[\]{};:|,.<>/?]').hasMatch(char)) {
-          color = AppColors.primary;
+          color = theme.colorScheme.primary;
         } else {
-          color = AppColors.onSurface;
+          color = theme.colorScheme.onSurface;
         }
 
         return Text(

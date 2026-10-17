@@ -23,4 +23,20 @@ class AppSpacing {
 
   // Safe zones
   static const double lateralSafeMargin = 16.0;
+
+  // Compact spacing for web/desktop (ultra-dense layouts)
+  static const double compactXs = 2.0; // 0.125rem
+  static const double compactSm = 4.0; // 0.25rem
+  static const double compactMd = 6.0; // 0.375rem
+  static const double compactLg = 8.0; // 0.5rem
+  static const double compactXl = 10.0; // 0.625rem
+
+  // Compact card padding for web/desktop
+  static const double compactCardPadding = 8.0;
+  static const double compactCardPaddingMd = 10.0;
+
+  // Max container width for web/desktop
+  static const double maxContainerWidth = 1150.0;
+  static const double maxContainerWidthMin = 1100.0;
+  static const double maxContainerWidthMax = 1200.0;
 }

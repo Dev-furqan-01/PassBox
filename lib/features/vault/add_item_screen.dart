@@ -7,7 +7,9 @@ import '../vault/models/vault.dart';
 import '../auth/auth_service.dart';
 
 class AddItemScreen extends StatefulWidget {
-  const AddItemScreen({super.key});
+  final Vault? vaultToEdit;
+
+  const AddItemScreen({super.key, this.vaultToEdit});
 
   @override
   State<AddItemScreen> createState() => _AddItemScreenState();
@@ -31,6 +33,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.vaultToEdit != null) {
+      _serviceController.text = widget.vaultToEdit!.service;
+      _usernameController.text = widget.vaultToEdit!.username;
+      _passwordController.text = widget.vaultToEdit!.password;
+      _iconController.text = widget.vaultToEdit!.icon ?? '';
+      _isFavorite = widget.vaultToEdit!.isFavorite;
+    }
   }
 
   @override
@@ -60,30 +69,45 @@ class _AddItemScreenState extends State<AddItemScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _vaultService.createVault(
-        service: _serviceController.text.trim(),
-        username: _usernameController.text.trim(),
-        password: _passwordController.text,
-        icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
-        isFavorite: _isFavorite,
-        version: 1,
-      );
+      if (widget.vaultToEdit != null) {
+        // Update existing vault
+        await _vaultService.updateVault(
+          vaultId: widget.vaultToEdit!.vaultId,
+          service: _serviceController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+          icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
+          isFavorite: _isFavorite,
+        );
+      } else {
+        // Create new vault
+        await _vaultService.createVault(
+          service: _serviceController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+          icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
+          isFavorite: _isFavorite,
+          version: 1,
+        );
+      }
 
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Item added successfully!'),
-            backgroundColor: AppColors.secondary,
+            content: Text(widget.vaultToEdit != null ? 'Item updated successfully!' : 'Item added successfully!'),
+            backgroundColor: theme.colorScheme.secondary,
           ),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to add item: $e'),
-            backgroundColor: AppColors.error,
+            content: Text(widget.vaultToEdit != null ? 'Failed to update item: $e' : 'Failed to add item: $e'),
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -96,37 +120,38 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: theme.colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.onSurface),
+          icon: Icon(Icons.close, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Add New Item',
+          widget.vaultToEdit != null ? 'Edit Item' : 'Add New Item',
           style: AppTextStyles.headlineMd.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _handleSave,
             child: _isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
                     ),
                   )
                 : Text(
                     'Save',
                     style: AppTextStyles.bodyLg.copyWith(
-                      color: AppColors.primary,
+                      color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -150,15 +175,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   fit: BoxFit.contain,
                 ),
                 const SizedBox(height: AppSpacing.spaceMd),
-                _buildServiceField(),
+                _buildServiceField(context),
                 const SizedBox(height: AppSpacing.spaceMd),
-                _buildUsernameField(),
+                _buildUsernameField(context),
                 const SizedBox(height: AppSpacing.spaceMd),
-                _buildPasswordField(),
+                _buildPasswordField(context),
                 const SizedBox(height: AppSpacing.spaceMd),
-                _buildIconField(),
+                _buildIconField(context),
                 const SizedBox(height: AppSpacing.spaceMd),
-                _buildToggleOptions(),
+                _buildToggleOptions(context),
                 const SizedBox(height: AppSpacing.spaceXl),
               ],
             ),
@@ -168,22 +193,23 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildServiceField() {
+  Widget _buildServiceField(BuildContext context) {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _serviceController,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Service Name',
         hintText: 'e.g., Google, GitHub, Netflix',
         prefixIcon: const Icon(Icons.business_outlined),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainer,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -194,15 +220,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -214,22 +240,23 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildUsernameField() {
+  Widget _buildUsernameField(BuildContext context) {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _usernameController,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Username / Email',
         hintText: 'Enter your username or email',
         prefixIcon: const Icon(Icons.person_outlined),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainer,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -240,15 +267,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -260,11 +287,12 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(BuildContext context) {
+    final theme = Theme.of(context);
     return TextFormField(
       controller: _passwordController,
       obscureText: _obscurePassword,
-      style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Password',
         hintText: 'Enter your password',
@@ -288,9 +316,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   _passwordController.text = generatedPassword;
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Password generated!'),
-                    backgroundColor: AppColors.secondary,
+                    backgroundColor: theme.colorScheme.secondary,
                     duration: Duration(seconds: 2),
                   ),
                 );
@@ -299,13 +327,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
           ],
         ),
         labelStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
         hintStyle: AppTextStyles.bodySm.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
         ),
         filled: true,
-        fillColor: AppColors.surfaceContainer,
+        fillColor: theme.colorScheme.surfaceContainer,
         border: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           borderSide: BorderSide.none,
@@ -316,15 +344,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: theme.colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
         ),
       ),
       validator: (value) {
@@ -336,13 +364,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildIconField() {
+  Widget _buildIconField(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TextFormField(
           controller: _iconController,
-          style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+          style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             labelText: 'Icon (Optional)',
             hintText: 'Tap emoji icon to select an emoji',
@@ -359,13 +388,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
               },
             ),
             labelStyle: AppTextStyles.bodySm.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             hintStyle: AppTextStyles.bodySm.copyWith(
-              color: AppColors.onSurfaceVariant.withOpacity(0.5),
+              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
             ),
             filled: true,
-            fillColor: AppColors.surfaceContainer,
+            fillColor: theme.colorScheme.surfaceContainer,
             border: OutlineInputBorder(
               borderRadius: AppBorderRadius.defaultRadiusBorder,
               borderSide: BorderSide.none,
@@ -376,15 +405,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppBorderRadius.defaultRadiusBorder,
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: AppBorderRadius.defaultRadiusBorder,
-              borderSide: const BorderSide(color: AppColors.error),
+              borderSide: BorderSide(color: theme.colorScheme.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: AppBorderRadius.defaultRadiusBorder,
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
+              borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
             ),
           ),
           readOnly: true,
@@ -394,12 +423,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
             });
           },
         ),
-        if (_showEmojiPicker) _buildEmojiPicker(),
+        if (_showEmojiPicker) _buildEmojiPicker(context),
       ],
     );
   }
 
-  Widget _buildEmojiPicker() {
+  Widget _buildEmojiPicker(BuildContext context) {
+    final theme = Theme.of(context);
     final emojis = [
       '🔒', '🔐', '🔑', '🗝️', '🔓', '🔏', '🔎', '🔍',
       '💼', '🏢', '🏠', '🏦', '💳', '💰', '💸', '💎',
@@ -415,7 +445,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       height: 250,
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: AppBorderRadius.defaultRadiusBorder,
       ),
       child: GridView.builder(
@@ -436,7 +466,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: theme.colorScheme.surface,
                 borderRadius: AppBorderRadius.smRadius,
               ),
               child: Center(
@@ -452,17 +482,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  Widget _buildToggleOptions() {
+  Widget _buildToggleOptions(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         SwitchListTile(
           title: Text(
             'Add to Favorites',
-            style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+            style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
           ),
           subtitle: Text(
             'Show in pinned favorites section',
-            style: AppTextStyles.bodySm.copyWith(color: AppColors.onSurfaceVariant),
+            style: AppTextStyles.bodySm.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
           value: _isFavorite,
           onChanged: (bool value) {
@@ -470,7 +501,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
               _isFavorite = value;
             });
           },
-          activeColor: AppColors.primary,
+          activeColor: theme.colorScheme.primary,
         ),
       ],
     );

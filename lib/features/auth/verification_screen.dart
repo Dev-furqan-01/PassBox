@@ -56,10 +56,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         await _authService.syncEmailVerificationStatus();
         
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Email already verified! Redirecting...'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: theme.colorScheme.secondary,
             ),
           );
           Navigator.pushReplacementNamed(context, '/main');
@@ -68,10 +69,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         // User is not authenticated, prompt them to login
         print('User not authenticated during verification check');
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Session expired. Please login again.'),
-              backgroundColor: AppColors.caution,
+              backgroundColor: theme.colorScheme.tertiary,
               duration: const Duration(seconds: 3),
             ),
           );
@@ -118,10 +120,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
       );
 
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Verification email sent successfully! Please check your inbox and spam folder.'),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: theme.colorScheme.secondary,
             duration: const Duration(seconds: 4),
           ),
         );
@@ -138,16 +141,17 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         metadata: {'error': e.toString()},
       );
       if (mounted) {
+        final theme = Theme.of(context);
         // If user is not authenticated, prompt them to login again
         if (e.toString().contains('No authenticated user')) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Session expired. Please login again to resend verification email.'),
-              backgroundColor: AppColors.caution,
+              backgroundColor: theme.colorScheme.tertiary,
               duration: const Duration(seconds: 4),
               action: SnackBarAction(
                 label: 'Login',
-                textColor: AppColors.onPrimary,
+                textColor: theme.colorScheme.onPrimary,
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -158,7 +162,7 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to send email: ${e.toString()}'),
-              backgroundColor: AppColors.error,
+              backgroundColor: theme.colorScheme.error,
               duration: const Duration(seconds: 4),
             ),
           );
@@ -184,10 +188,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         await _authService.syncEmailVerificationStatus();
         
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Email verified successfully!'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: theme.colorScheme.secondary,
             ),
           );
           // Navigate to main screen instead of pop
@@ -196,10 +201,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
       } else if (refreshedUser == null) {
         // User is not authenticated, prompt them to login
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Session expired. Please login again.'),
-              backgroundColor: AppColors.caution,
+              backgroundColor: theme.colorScheme.tertiary,
               duration: const Duration(seconds: 3),
             ),
           );
@@ -207,10 +213,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         }
       } else {
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Email not verified yet. Please check your inbox and click the verification link.'),
-              backgroundColor: AppColors.caution,
+              backgroundColor: theme.colorScheme.tertiary,
               duration: const Duration(seconds: 4),
             ),
           );
@@ -219,10 +226,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
     } catch (e) {
       print('Error during verification check: $e');
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error checking verification status: ${e.toString()}'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
             duration: const Duration(seconds: 4),
           ),
         );
@@ -236,8 +244,9 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.margin),
@@ -264,6 +273,7 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -271,20 +281,20 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
             Icons.email_outlined,
             size: 40,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceMd),
         Text(
           'Verify Your Email',
           style: AppTextStyles.headlineLg.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
           textAlign: TextAlign.center,
         ),
@@ -292,7 +302,7 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         Text(
           'We\'ve sent a verification link to your email address. Please verify your account to continue.',
           style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
           textAlign: TextAlign.center,
         ),
@@ -300,7 +310,7 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         Text(
           'Check your inbox and spam folder',
           style: AppTextStyles.bodySm.copyWith(
-            color: AppColors.onSurfaceVariant.withOpacity(0.7),
+            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -309,10 +319,11 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
   }
 
   Widget _buildEmailDisplay() {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.spaceMd),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.defaultRadiusBorder,
       ),
       child: Column(
@@ -320,14 +331,14 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
           Text(
             'Email sent to:',
             style: AppTextStyles.bodySm.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: AppSpacing.spaceXs),
           Text(
             widget.email,
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.onSurface,
+              color: theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -337,19 +348,20 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
   }
 
   Widget _buildTimerDisplay() {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Text(
           'Resend available in:',
           style: AppTextStyles.bodySm.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceSm),
         Text(
           _formatTime(_remainingSeconds),
           style: AppTextStyles.headlineMd.copyWith(
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -358,11 +370,12 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
   }
 
   Widget _buildResendButton() {
+    final theme = Theme.of(context);
     return ElevatedButton(
       onPressed: (_canResend && !_isLoading) ? _handleResendEmail : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: _canResend ? AppColors.primary : AppColors.onSurfaceVariant.withOpacity(0.3),
-        foregroundColor: AppColors.onPrimary,
+        backgroundColor: _canResend ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+        foregroundColor: theme.colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
         shape: RoundedRectangleBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
@@ -370,18 +383,18 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
         elevation: 0,
       ),
       child: _isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 20,
               width: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
+                valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.onPrimary),
               ),
             )
           : Text(
               'Resend Verification Email',
               style: AppTextStyles.bodyLg.copyWith(
-                color: _canResend ? AppColors.onPrimary : AppColors.onSurfaceVariant,
+                color: _canResend ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -389,29 +402,30 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
   }
 
   Widget _buildCheckButton() {
+    final theme = Theme.of(context);
     return OutlinedButton(
       onPressed: _isLoading ? null : _handleCheckVerification,
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primary,
-        side: const BorderSide(color: AppColors.primary),
+        foregroundColor: theme.colorScheme.primary,
+        side: BorderSide(color: theme.colorScheme.primary),
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.spaceMd),
         shape: RoundedRectangleBorder(
           borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
       ),
       child: _isLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 20,
               width: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
               ),
             )
           : Text(
               'I\'ve Verified My Email',
               style: AppTextStyles.bodyLg.copyWith(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -419,6 +433,7 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
   }
 
   Widget _buildBackButton() {
+    final theme = Theme.of(context);
     return TextButton(
       onPressed: () async {
         // Sign out user before going back to login
@@ -430,7 +445,7 @@ class _VerificationScreenState extends State<VerificationScreen> with WidgetsBin
       child: Text(
         'Back to Login',
         style: AppTextStyles.bodyMd.copyWith(
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
     );

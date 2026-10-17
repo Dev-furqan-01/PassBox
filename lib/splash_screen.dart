@@ -85,8 +85,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: theme.colorScheme.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -106,7 +107,7 @@ class _SplashScreenState extends State<SplashScreen>
             Text(
               'PassBox',
               style: AppTextStyles.headlineXl.copyWith(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -114,7 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
             Text(
               'Secure Password Manager',
               style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],

@@ -6,9 +6,10 @@ class EntropyInfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.lgRadius,
         boxShadow: AppShadows.cardElevation,
       ),
@@ -19,12 +20,12 @@ class EntropyInfoBanner extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainerHighest,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: AppBorderRadius.defaultRadiusBorder,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.memory,
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               size: 22,
             ),
           ),
@@ -36,14 +37,14 @@ class EntropyInfoBanner extends StatelessWidget {
                 Text(
                   'CSPRNG Node • OS Level',
                   style: AppTextStyles.headlineSm.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   'Entropy drawn via crypto.getRandomValues',
                   style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -56,13 +57,13 @@ class EntropyInfoBanner extends StatelessWidget {
               vertical: 4,
             ),
             decoration: BoxDecoration(
-              color: AppColors.secondary.withOpacity(0.1),
+              color: theme.colorScheme.secondary.withOpacity(0.1),
               borderRadius: AppBorderRadius.defaultRadiusBorder,
             ),
             child: Text(
               'ACTIVE',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.secondary,
+                color: theme.colorScheme.secondary,
                 letterSpacing: 0.1,
               ),
             ),

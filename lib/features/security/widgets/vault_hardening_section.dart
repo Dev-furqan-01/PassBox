@@ -12,19 +12,20 @@ class VaultHardeningSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Vault Hardening & Privacy',
           style: AppTextStyles.headlineSm.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceXs),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
+            color: theme.colorScheme.surfaceContainer,
             borderRadius: AppBorderRadius.lgRadius,
             boxShadow: AppShadows.cardElevation,
           ),
@@ -38,7 +39,7 @@ class VaultHardeningSection extends StatelessWidget {
                     Divider(
                       height: 1,
                       thickness: 1,
-                      color: AppColors.surfaceContainerHigh,
+                      color: theme.colorScheme.surfaceContainerHigh,
                     ),
                 ],
               );
@@ -57,6 +58,7 @@ class _VaultSettingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () {
         // TODO: Handle navigation or toggle
@@ -73,7 +75,7 @@ class _VaultSettingItem extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerHigh,
+                      color: theme.colorScheme.surfaceContainerHigh,
                       borderRadius: AppBorderRadius.smRadius,
                     ),
                     child: Icon(
@@ -90,14 +92,14 @@ class _VaultSettingItem extends StatelessWidget {
                         Text(
                           setting.title,
                           style: AppTextStyles.headlineSm.copyWith(
-                            color: AppColors.onSurface,
+                            color: theme.colorScheme.onSurface,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           setting.description,
                           style: AppTextStyles.bodySm.copyWith(
-                            color: AppColors.onSurfaceVariant,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -106,14 +108,15 @@ class _VaultSettingItem extends StatelessWidget {
                 ],
               ),
             ),
-            _buildTrailing(),
+            _buildTrailing(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTrailing() {
+  Widget _buildTrailing(BuildContext context) {
+    final theme = Theme.of(context);
     switch (setting.type) {
       case SettingType.toggle:
         return Switch(
@@ -121,15 +124,15 @@ class _VaultSettingItem extends StatelessWidget {
           onChanged: (value) {
             // TODO: Handle toggle
           },
-          activeColor: AppColors.secondaryContainer,
-          activeTrackColor: AppColors.secondaryContainer,
-          inactiveThumbColor: AppColors.onSurface,
-          inactiveTrackColor: AppColors.surfaceContainerHighest,
+          activeColor: theme.colorScheme.secondaryContainer,
+          activeTrackColor: theme.colorScheme.secondaryContainer,
+          inactiveThumbColor: theme.colorScheme.onSurface,
+          inactiveTrackColor: theme.colorScheme.surfaceContainerHighest,
         );
       case SettingType.navigation:
-        return const Icon(
+        return Icon(
           Icons.chevron_right,
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
           size: 18,
         );
       case SettingType.status:
@@ -139,13 +142,13 @@ class _VaultSettingItem extends StatelessWidget {
             vertical: 2,
           ),
           decoration: BoxDecoration(
-            color: AppColors.secondary.withOpacity(0.15),
+            color: theme.colorScheme.secondary.withOpacity(0.15),
             borderRadius: AppBorderRadius.fullRadius,
           ),
           child: Text(
             setting.statusBadge ?? 'Active',
             style: AppTextStyles.labelBadge.copyWith(
-              color: AppColors.secondary,
+              color: theme.colorScheme.secondary,
             ),
           ),
         );

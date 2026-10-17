@@ -15,6 +15,7 @@ class CategoryPills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       height: 36,
       child: ListView.builder(
@@ -59,6 +60,7 @@ class _CategoryPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -67,7 +69,7 @@ class _CategoryPill extends StatelessWidget {
           vertical: 6,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceContainer,
+          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.fullRadius,
           boxShadow: isSelected ? AppShadows.cardElevation : null,
         ),
@@ -77,8 +79,8 @@ class _CategoryPill extends StatelessWidget {
               name,
               style: AppTextStyles.labelBadge.copyWith(
                 color: isSelected
-                    ? AppColors.onPrimary
-                    : AppColors.onSurfaceVariant,
+                    ? theme.colorScheme.onPrimary
+                    : theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(width: 6),
@@ -89,7 +91,7 @@ class _CategoryPill extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.onPrimary.withOpacity(0.2)
+                    ? theme.colorScheme.onPrimary.withOpacity(0.2)
                     : Colors.transparent,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
@@ -97,8 +99,8 @@ class _CategoryPill extends StatelessWidget {
                 count.toString(),
                 style: AppTextStyles.labelBadge.copyWith(
                   color: isSelected
-                      ? AppColors.onPrimary
-                      : AppColors.outline,
+                      ? theme.colorScheme.onPrimary
+                      : theme.colorScheme.outline,
                 ),
               ),
             ),

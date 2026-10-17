@@ -6,9 +6,10 @@ class AboutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.lgRadius,
         boxShadow: AppShadows.cardElevation,
       ),
@@ -22,12 +23,12 @@ class AboutSection extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: theme.colorScheme.primary,
                   borderRadius: AppBorderRadius.lgRadius,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.lock,
-                  color: AppColors.onPrimary,
+                  color: theme.colorScheme.onPrimary,
                   size: 24,
                 ),
               ),
@@ -38,14 +39,14 @@ class AboutSection extends StatelessWidget {
                   Text(
                     'PassBox',
                     style: AppTextStyles.headlineMd.copyWith(
-                      color: AppColors.onSurface,
+                      color: theme.colorScheme.onSurface,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
                     'Version 1.0.0',
                     style: AppTextStyles.bodySm.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -56,7 +57,7 @@ class AboutSection extends StatelessWidget {
           Text(
             'Secure password manager with zero-knowledge encryption. Your secrets never leave your device.',
             style: AppTextStyles.bodySm.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -108,6 +109,7 @@ class _AboutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -116,21 +118,21 @@ class _AboutButton extends StatelessWidget {
           vertical: AppSpacing.spaceSm,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHigh,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
         child: Column(
           children: [
             Icon(
               icon,
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               size: 20,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],

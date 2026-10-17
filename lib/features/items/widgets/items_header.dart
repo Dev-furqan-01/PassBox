@@ -13,6 +13,7 @@ class ItemsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lateralSafeMargin,
@@ -29,7 +30,7 @@ class ItemsHeader extends StatelessWidget {
                     Text(
                       'PassBox',
                       style: AppTextStyles.headlineSm.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -39,7 +40,7 @@ class ItemsHeader extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withOpacity(0.1),
+                        color: theme.colorScheme.secondary.withOpacity(0.1),
                         borderRadius: AppBorderRadius.fullRadius,
                       ),
                       child: Row(
@@ -48,7 +49,7 @@ class ItemsHeader extends StatelessWidget {
                             width: 6,
                             height: 6,
                             decoration: BoxDecoration(
-                              color: AppColors.secondary,
+                              color: theme.colorScheme.secondary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -56,7 +57,7 @@ class ItemsHeader extends StatelessWidget {
                           Text(
                             'LOCKED',
                             style: AppTextStyles.labelBadge.copyWith(
-                              color: AppColors.secondary,
+                              color: theme.colorScheme.secondary,
                             ),
                           ),
                         ],
@@ -68,7 +69,7 @@ class ItemsHeader extends StatelessWidget {
                 Text(
                   'Passwords',
                   style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -86,9 +87,9 @@ class ItemsHeader extends StatelessWidget {
                     color: Colors.transparent,
                     borderRadius: AppBorderRadius.defaultRadiusBorder,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.sync,
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                     size: 20,
                   ),
                 ),
@@ -100,12 +101,12 @@ class ItemsHeader extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
+                    color: theme.colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.person,
-                    color: AppColors.onPrimary,
+                    color: theme.colorScheme.onPrimary,
                     size: 18,
                   ),
                 ),

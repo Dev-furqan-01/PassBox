@@ -19,13 +19,14 @@ class SortToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lateralSafeMargin,
         vertical: AppSpacing.spaceXs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withOpacity(0.6),
+        color: theme.colorScheme.surface.withOpacity(0.6),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -34,28 +35,28 @@ class SortToolbar extends StatelessWidget {
             onTap: () => _showSortOptions(context),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.swap_vert,
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                   size: 14,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   'SORT BY: ',
                   style: AppTextStyles.labelBadge.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
                   currentSort.toUpperCase(),
                   style: AppTextStyles.labelBadge.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.expand_more,
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                   size: 14,
                 ),
               ],
@@ -73,7 +74,7 @@ class SortToolbar extends StatelessWidget {
                   ),
                   child: Icon(
                     isCompactView ? Icons.list : Icons.density_medium,
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                     size: 18,
                   ),
                 ),
@@ -93,7 +94,7 @@ class SortToolbar extends StatelessWidget {
                   child: Text(
                     'SELECT',
                     style: AppTextStyles.labelBadge.copyWith(
-                      color: AppColors.primary,
+                      color: theme.colorScheme.primary,
                       letterSpacing: 0.1,
                     ),
                   ),
@@ -107,9 +108,10 @@ class SortToolbar extends StatelessWidget {
   }
 
   void _showSortOptions(BuildContext context) {
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surfaceContainer,
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(16),
@@ -124,6 +126,7 @@ class SortToolbar extends StatelessWidget {
               _SortOption(
                 label: 'Recently Used',
                 isSelected: currentSort == 'Recently Used',
+                theme: theme,
                 onTap: () {
                   onSortChanged('Recently Used');
                   Navigator.pop(context);
@@ -132,6 +135,7 @@ class SortToolbar extends StatelessWidget {
               _SortOption(
                 label: 'Alphabetical',
                 isSelected: currentSort == 'Alphabetical',
+                theme: theme,
                 onTap: () {
                   onSortChanged('Alphabetical');
                   Navigator.pop(context);
@@ -140,6 +144,7 @@ class SortToolbar extends StatelessWidget {
               _SortOption(
                 label: 'Password Strength',
                 isSelected: currentSort == 'Password Strength',
+                theme: theme,
                 onTap: () {
                   onSortChanged('Password Strength');
                   Navigator.pop(context);
@@ -148,6 +153,7 @@ class SortToolbar extends StatelessWidget {
               _SortOption(
                 label: 'Date Created',
                 isSelected: currentSort == 'Date Created',
+                theme: theme,
                 onTap: () {
                   onSortChanged('Date Created');
                   Navigator.pop(context);
@@ -164,11 +170,13 @@ class SortToolbar extends StatelessWidget {
 class _SortOption extends StatelessWidget {
   final String label;
   final bool isSelected;
+  final ThemeData theme;
   final VoidCallback onTap;
 
   const _SortOption({
     required this.label,
     required this.isSelected,
+    required this.theme,
     required this.onTap,
   });
 
@@ -182,7 +190,7 @@ class _SortOption extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryContainer.withOpacity(0.2)
+              ? theme.colorScheme.primaryContainer.withOpacity(0.2)
               : Colors.transparent,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
@@ -192,16 +200,16 @@ class _SortOption extends StatelessWidget {
               label,
               style: AppTextStyles.bodyMd.copyWith(
                 color: isSelected
-                    ? AppColors.primary
-                    : AppColors.onSurface,
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
             const Spacer(),
             if (isSelected)
-              const Icon(
+              Icon(
                 Icons.check,
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 size: 18,
               ),
           ],

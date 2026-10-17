@@ -27,10 +27,11 @@ class _CredentialRowState extends State<CredentialRow> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.spaceSm),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.defaultRadiusBorder,
         boxShadow: AppShadows.cardElevation,
       ),
@@ -39,57 +40,57 @@ class _CredentialRowState extends State<CredentialRow> {
         children: [
           _ServiceIcon(
             icon: widget.item.icon,
-            color: _getIconColor(),
+            color: _getIconColor(theme),
           ),
           const SizedBox(width: AppSpacing.spaceSm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildServiceName(),
+                _buildServiceName(theme),
                 const SizedBox(height: 2),
                 Text(
                   widget.item.username,
                   style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
-                _buildPasswordField(),
+                _buildPasswordField(theme),
                 if (widget.item.hasTotp) ...[
                   const SizedBox(height: 8),
-                  _buildTotpPill(),
+                  _buildTotpPill(theme),
                 ],
               ],
             ),
           ),
           const SizedBox(width: AppSpacing.spaceXs),
-          _buildActionButtons(),
+          _buildActionButtons(theme),
         ],
       ),
     );
   }
 
-  Widget _buildServiceName() {
+  Widget _buildServiceName(ThemeData theme) {
     return Row(
       children: [
         Expanded(
           child: Text(
             widget.item.service,
             style: AppTextStyles.headlineSm.copyWith(
-              color: AppColors.onSurface,
+              color: theme.colorScheme.onSurface,
             ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(width: 4),
-        _buildStrengthBadge(),
+        _buildStrengthBadge(theme),
         if (widget.item.hasApiKey) ...[
           const SizedBox(width: 4),
           Icon(
             Icons.key,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             size: 13,
           ),
         ],
@@ -97,32 +98,32 @@ class _CredentialRowState extends State<CredentialRow> {
     );
   }
 
-  Widget _buildStrengthBadge() {
+  Widget _buildStrengthBadge(ThemeData theme) {
     Color badgeColor;
     String badgeText;
 
     if (widget.item.isCompromised) {
-      badgeColor = AppColors.error;
+      badgeColor = theme.colorScheme.error;
       badgeText = 'Compromised';
     } else if (widget.item.isReused) {
-      badgeColor = AppColors.tertiary;
+      badgeColor = theme.colorScheme.tertiary;
       badgeText = 'Medium (Reused)';
     } else {
       switch (widget.item.strength) {
         case PasswordStrength.weak:
-          badgeColor = AppColors.error;
+          badgeColor = theme.colorScheme.error;
           badgeText = widget.item.strength.passwordLength;
           break;
         case PasswordStrength.medium:
-          badgeColor = AppColors.tertiary;
+          badgeColor = theme.colorScheme.tertiary;
           badgeText = widget.item.strength.label;
           break;
         case PasswordStrength.strong:
-          badgeColor = AppColors.secondary;
+          badgeColor = theme.colorScheme.secondary;
           badgeText = widget.item.strength.label;
           break;
         case PasswordStrength.veryStrong:
-          badgeColor = AppColors.secondary;
+          badgeColor = theme.colorScheme.secondary;
           badgeText = widget.item.strength.label;
           break;
       }
@@ -159,7 +160,7 @@ class _CredentialRowState extends State<CredentialRow> {
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(ThemeData theme) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -167,7 +168,7 @@ class _CredentialRowState extends State<CredentialRow> {
           child: Text(
             _isPasswordVisible ? widget.item.password : '•' * widget.item.password.length,
             style: AppTextStyles.labelCodeMd.copyWith(
-              color: _isPasswordVisible ? AppColors.onSurface : AppColors.outline,
+              color: _isPasswordVisible ? theme.colorScheme.onSurface : theme.colorScheme.outline,
               letterSpacing: 2,
             ),
             overflow: TextOverflow.ellipsis,
@@ -183,7 +184,7 @@ class _CredentialRowState extends State<CredentialRow> {
           },
           child: Icon(
             _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-            color: AppColors.outline,
+            color: theme.colorScheme.outline,
             size: 15,
           ),
         ),
@@ -191,7 +192,7 @@ class _CredentialRowState extends State<CredentialRow> {
     );
   }
 
-  Widget _buildTotpPill() {
+  Widget _buildTotpPill(ThemeData theme) {
     return GestureDetector(
       onTap: widget.onTotpTap,
       child: Container(
@@ -200,7 +201,7 @@ class _CredentialRowState extends State<CredentialRow> {
           vertical: 4,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHigh,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
         child: Row(
@@ -208,7 +209,7 @@ class _CredentialRowState extends State<CredentialRow> {
             Text(
               'TOTP',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.outline,
+                color: theme.colorScheme.outline,
                 letterSpacing: 0.1,
               ),
             ),
@@ -216,18 +217,18 @@ class _CredentialRowState extends State<CredentialRow> {
             Text(
               widget.item.totpCode ?? '--- ---',
               style: AppTextStyles.labelCodeMd.copyWith(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.1,
               ),
             ),
             const SizedBox(width: 8),
-            _buildTotpTimer(),
+            _buildTotpTimer(theme),
             const SizedBox(width: 4),
             Text(
               '${widget.item.totpSecondsRemaining ?? 0}s',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.outline,
+                color: theme.colorScheme.outline,
               ),
             ),
           ],
@@ -236,7 +237,7 @@ class _CredentialRowState extends State<CredentialRow> {
     );
   }
 
-  Widget _buildTotpTimer() {
+  Widget _buildTotpTimer(ThemeData theme) {
     final progress = (widget.item.totpSecondsRemaining ?? 0) / 30.0;
     return SizedBox(
       width: 14,
@@ -244,32 +245,35 @@ class _CredentialRowState extends State<CredentialRow> {
       child: CircularProgressIndicator(
         value: progress,
         strokeWidth: 3,
-        backgroundColor: AppColors.surfaceContainerHighest,
-        valueColor: const AlwaysStoppedAnimation<Color>(
-          AppColors.primary,
+        backgroundColor: theme.colorScheme.surfaceContainerHighest,
+        valueColor: AlwaysStoppedAnimation<Color>(
+          theme.colorScheme.primary,
         ),
       ),
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(ThemeData theme) {
     return Column(
       children: [
         Row(
           children: [
             _ActionButton(
               icon: Icons.content_copy,
+              theme: theme,
               onTap: widget.onCopy,
             ),
             const SizedBox(width: 2),
             _ActionButton(
               icon: widget.item.isFavorite ? Icons.star : Icons.star_border,
-              iconColor: widget.item.isFavorite ? AppColors.tertiary : null,
+              iconColor: widget.item.isFavorite ? theme.colorScheme.tertiary : null,
+              theme: theme,
               onTap: widget.onFavoriteToggle,
             ),
             const SizedBox(width: 2),
             _ActionButton(
               icon: Icons.more_vert,
+              theme: theme,
               onTap: widget.onOptions,
             ),
           ],
@@ -278,9 +282,9 @@ class _CredentialRowState extends State<CredentialRow> {
     );
   }
 
-  Color _getIconColor() {
-    if (widget.item.isCompromised) return AppColors.error;
-    return AppColors.primary;
+  Color _getIconColor(ThemeData theme) {
+    if (widget.item.isCompromised) return theme.colorScheme.error;
+    return theme.colorScheme.primary;
   }
 }
 
@@ -295,13 +299,14 @@ class _ServiceIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     // Check if icon is an emoji (single character from emoji ranges)
     if (icon != null && _isEmoji(icon!)) {
       return Container(
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHigh,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
         ),
         child: Center(
@@ -318,7 +323,7 @@ class _ServiceIcon extends StatelessWidget {
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: AppBorderRadius.defaultRadiusBorder,
       ),
       child: Icon(
@@ -384,11 +389,13 @@ class _ServiceIcon extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   final IconData icon;
   final Color? iconColor;
+  final ThemeData theme;
   final VoidCallback onTap;
 
   const _ActionButton({
     required this.icon,
     this.iconColor,
+    required this.theme,
     required this.onTap,
   });
 
@@ -400,12 +407,12 @@ class _ActionButton extends StatelessWidget {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerHigh,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.smRadius,
         ),
         child: Icon(
           icon,
-          color: iconColor ?? AppColors.onSurfaceVariant,
+          color: iconColor ?? theme.colorScheme.onSurfaceVariant,
           size: 18,
         ),
       ),

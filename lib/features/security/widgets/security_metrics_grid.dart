@@ -12,6 +12,7 @@ class SecurityMetricsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -22,33 +23,33 @@ class SecurityMetricsGrid extends StatelessWidget {
       children: [
         _MetricCard(
           icon: Icons.lock_reset,
-          iconColor: AppColors.tertiary,
+          iconColor: theme.colorScheme.tertiary,
           badge: 'Needs Update',
-          badgeColor: AppColors.tertiary,
+          badgeColor: theme.colorScheme.tertiary,
           value: metrics.weakPasswords.toString(),
           label: 'Weak Passwords',
         ),
         _MetricCard(
           icon: Icons.content_copy,
-          iconColor: AppColors.tertiary,
+          iconColor: theme.colorScheme.tertiary,
           badge: '2 Sites',
-          badgeColor: AppColors.tertiary,
+          badgeColor: theme.colorScheme.tertiary,
           value: metrics.reusedPasswords.toString(),
           label: 'Reused Across Sites',
         ),
         _MetricCard(
           icon: Icons.security,
-          iconColor: AppColors.secondary,
+          iconColor: theme.colorScheme.secondary,
           badge: 'Clean',
-          badgeColor: AppColors.secondary,
+          badgeColor: theme.colorScheme.secondary,
           value: metrics.breachesDetected.toString(),
           label: 'Breaches Detected',
         ),
         _MetricCard(
           icon: Icons.phonelink_lock,
-          iconColor: AppColors.primary,
+          iconColor: theme.colorScheme.primary,
           badge: '5 Avail',
-          badgeColor: AppColors.primary,
+          badgeColor: theme.colorScheme.primary,
           value: metrics.missing2FA.toString(),
           label: 'Missing 2FA',
         ),
@@ -76,9 +77,10 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: AppBorderRadius.lgRadius,
       ),
       padding: const EdgeInsets.all(12),
@@ -118,16 +120,16 @@ class _MetricCard extends StatelessWidget {
               Text(
                 value,
                 style: AppTextStyles.headlineLg.copyWith(
-                  color: badgeColor == AppColors.secondary
-                      ? AppColors.secondary
-                      : AppColors.onSurface,
+                  color: badgeColor == theme.colorScheme.secondary
+                      ? theme.colorScheme.secondary
+                      : theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
                 label,
                 style: AppTextStyles.bodySm.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

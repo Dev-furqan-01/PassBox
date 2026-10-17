@@ -9,7 +9,7 @@ import 'widgets/search_bar.dart';
 import 'widgets/security_status_card.dart';
 import 'widgets/quick_actions.dart';
 import 'widgets/vault_card.dart';
-import 'add_item_screen.dart';
+import 'add_item_screen_responsive.dart';
 import '../generate/generate_screen.dart';
 import '../vault/vault_service.dart';
 import '../vault/models/vault.dart' as VaultModel;
@@ -28,10 +28,14 @@ class _VaultScreenState extends State<VaultScreen> {
   final AuthService _authService = AuthService();
   final _adMobService = AdMobService();
   Timer? _bannerRefreshTimer;
+  Timer? _searchDebounce;
 
   List<VaultItem> _favoriteItems = [];
   List<VaultItem> _recentItems = [];
+  List<VaultItem> _allFavoriteItems = [];
+  List<VaultItem> _allRecentItems = [];
   bool _isLoading = true;
+  bool _isSearching = false;
   int _weakPasswords = 0;
   int _reusedPasswords = 0;
   int _healthScore = 94;
@@ -57,6 +61,83 @@ class _VaultScreenState extends State<VaultScreen> {
     await _loadData();
   }
 
+  void _filterItems(String query) {
+    // Cancel previous debounce timer
+    _searchDebounce?.cancel();
+
+    if (query.isEmpty) {
+      setState(() {
+        _favoriteItems = _allFavoriteItems;
+        _recentItems = _allRecentItems;
+        _isSearching = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
+
+    // Debounce the search to avoid too many Firestore calls
+    _searchDebounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final vaults = await _vaultService.searchVaults(query);
+
+        // Convert to VaultItem and separate into favorites and recent
+        final favoriteVaults = vaults.where((v) => v.isFavorite).toList();
+        final recentVaults = vaults.where((v) => !v.isFavorite).toList();
+
+        final favoriteItems = favoriteVaults.map((vault) {
+          return VaultItem(
+            id: vault.vaultId,
+            service: vault.service,
+            username: vault.username,
+            password: '••••••••',
+            icon: vault.icon,
+            isFavorite: vault.isFavorite,
+            isSecure: vault.isSecure,
+            lastUpdated: vault.lastUpdated,
+            category: vault.category,
+          );
+        }).toList();
+
+        final recentItems = recentVaults.map((vault) {
+          return VaultItem(
+            id: vault.vaultId,
+            service: vault.service,
+            username: vault.username,
+            password: '••••••••',
+            icon: vault.icon,
+            isFavorite: vault.isFavorite,
+            isSecure: vault.isSecure,
+            lastUpdated: vault.lastUpdated,
+            category: vault.category,
+          );
+        }).toList();
+
+        if (mounted) {
+          setState(() {
+            _favoriteItems = favoriteItems;
+            _recentItems = recentItems;
+            _isSearching = false;
+          });
+        }
+      } catch (e) {
+        print('Error searching vaults: $e');
+        if (mounted) {
+          setState(() {
+            _isSearching = false;
+          });
+        }
+      }
+    });
+  }
+
+  String _getSearchHintText() {
+    final totalItems = _allFavoriteItems.length + _allRecentItems.length;
+    return 'Search $totalItems items, logins, notes...';
+  }
+
   Future<void> _loadData() async {
     try {
       final vaults = await _vaultService.getAllVaults();
@@ -74,35 +155,39 @@ class _VaultScreenState extends State<VaultScreen> {
       final favoriteVaults = vaults.where((v) => v.isFavorite).toList();
       final recentVaults = vaults.where((v) => !v.isFavorite).toList();
 
+      final favoriteItems = favoriteVaults.map((vault) {
+        return VaultItem(
+          id: vault.vaultId,
+          service: vault.service,
+          username: vault.username,
+          password: '••••••••',
+          icon: vault.icon,
+          isFavorite: vault.isFavorite,
+          isSecure: vault.isSecure,
+          lastUpdated: vault.lastUpdated,
+          category: vault.category,
+        );
+      }).toList();
+
+      final recentItems = recentVaults.map((vault) {
+        return VaultItem(
+          id: vault.vaultId,
+          service: vault.service,
+          username: vault.username,
+          password: '••••••••',
+          icon: vault.icon,
+          isFavorite: vault.isFavorite,
+          isSecure: vault.isSecure,
+          lastUpdated: vault.lastUpdated,
+          category: vault.category,
+        );
+      }).toList();
+
       setState(() {
-        _favoriteItems = favoriteVaults.map((vault) {
-          return VaultItem(
-            id: vault.vaultId,
-            service: vault.service,
-            username: vault.username,
-            password: '••••••••',
-            icon: vault.icon,
-            isFavorite: vault.isFavorite,
-            isSecure: vault.isSecure,
-            lastUpdated: vault.lastUpdated,
-            category: vault.category,
-          );
-        }).toList();
-
-        _recentItems = recentVaults.map((vault) {
-          return VaultItem(
-            id: vault.vaultId,
-            service: vault.service,
-            username: vault.username,
-            password: '••••••••',
-            icon: vault.icon,
-            isFavorite: vault.isFavorite,
-            isSecure: vault.isSecure,
-            lastUpdated: vault.lastUpdated,
-            category: vault.category,
-          );
-        }).toList();
-
+        _allFavoriteItems = favoriteItems;
+        _allRecentItems = recentItems;
+        _favoriteItems = favoriteItems;
+        _recentItems = recentItems;
         _isLoading = false;
       });
     } catch (e) {
@@ -116,6 +201,7 @@ class _VaultScreenState extends State<VaultScreen> {
   @override
   void dispose() {
     _bannerRefreshTimer?.cancel();
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _adMobService.dispose();
     super.dispose();
@@ -141,10 +227,11 @@ class _VaultScreenState extends State<VaultScreen> {
       if (vault != null) {
         await Clipboard.setData(ClipboardData(text: vault.password));
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Password copied to clipboard'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: theme.colorScheme.secondary,
               duration: Duration(seconds: 2),
             ),
           );
@@ -153,10 +240,11 @@ class _VaultScreenState extends State<VaultScreen> {
     } catch (e) {
       print('Error copying password: $e');
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to copy password'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -226,10 +314,11 @@ class _VaultScreenState extends State<VaultScreen> {
       );
 
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(item.isFavorite ? 'Removed from favorites' : 'Added to favorites'),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: theme.colorScheme.secondary,
             duration: Duration(seconds: 2),
           ),
         );
@@ -239,10 +328,11 @@ class _VaultScreenState extends State<VaultScreen> {
       // Revert on error
       await _reloadData();
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update favorite status'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -259,8 +349,9 @@ class _VaultScreenState extends State<VaultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -280,7 +371,6 @@ class _VaultScreenState extends State<VaultScreen> {
                             builder: (context, snapshot) {
                               return VaultHeader(
                                 userName: snapshot.data ?? 'User',
-                                onLockTap: () {},
                                 onNotificationTap: () {},
                                 hasUnreadNotifications: true,
                               );
@@ -288,9 +378,8 @@ class _VaultScreenState extends State<VaultScreen> {
                           ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           VaultSearchBar(
-                            hintText: 'Search ${_favoriteItems.length + _recentItems.length} items, logins, notes...',
-                            onChanged: (value) {},
-                            onFilterTap: () {},
+                            hintText: _getSearchHintText(),
+                            onChanged: _filterItems,
                           ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           SecurityStatusCard(
@@ -304,12 +393,7 @@ class _VaultScreenState extends State<VaultScreen> {
                           const SizedBox(height: AppSpacing.spaceMd),
                           QuickActions(
                             onNewItem: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AddItemScreen(),
-                                ),
-                              );
+                              await AddItemScreenResponsive.show(context);
                               _reloadData();
                             },
                             onGenerate: () {
@@ -345,6 +429,7 @@ class _VaultScreenState extends State<VaultScreen> {
   }
 
   Widget _buildPinnedFavorites() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -353,16 +438,16 @@ class _VaultScreenState extends State<VaultScreen> {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.star,
-                  color: AppColors.tertiary,
+                  color: theme.colorScheme.tertiary,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   'Pinned Favorites',
                   style: AppTextStyles.headlineSm.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -372,7 +457,7 @@ class _VaultScreenState extends State<VaultScreen> {
               child: Text(
                 'MANAGE',
                 style: AppTextStyles.labelBadge.copyWith(
-                  color: AppColors.primary,
+                  color: theme.colorScheme.primary,
                   letterSpacing: 0.1,
                 ),
               ),
@@ -404,6 +489,7 @@ class _VaultScreenState extends State<VaultScreen> {
   }
 
   Widget _buildRecentlyUpdated() {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -412,16 +498,16 @@ class _VaultScreenState extends State<VaultScreen> {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.schedule,
-                  color: AppColors.outline,
+                  color: theme.colorScheme.outline,
                   size: 18,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   'Recently Updated',
                   style: AppTextStyles.headlineSm.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -429,7 +515,7 @@ class _VaultScreenState extends State<VaultScreen> {
             Text(
               '4 ITEMS',
               style: AppTextStyles.labelBadge.copyWith(
-                color: AppColors.outline,
+                color: theme.colorScheme.outline,
               ),
             ),
           ],

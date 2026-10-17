@@ -16,10 +16,11 @@ class SettingsItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      splashColor: AppColors.primary.withOpacity(0.1),
-      highlightColor: AppColors.primary.withOpacity(0.05),
+      splashColor: theme.colorScheme.primary.withOpacity(0.1),
+      highlightColor: theme.colorScheme.primary.withOpacity(0.05),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.spaceMd),
         child: Row(
@@ -32,7 +33,7 @@ class SettingsItemWidget extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerHigh,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: AppBorderRadius.smRadius,
                     ),
                     child: Icon(
@@ -49,7 +50,7 @@ class SettingsItemWidget extends StatelessWidget {
                         Text(
                           item.title,
                           style: AppTextStyles.headlineSm.copyWith(
-                            color: AppColors.onSurface,
+                            color: theme.colorScheme.onSurface,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -57,7 +58,7 @@ class SettingsItemWidget extends StatelessWidget {
                           Text(
                             item.description!,
                             style: AppTextStyles.bodySm.copyWith(
-                              color: AppColors.onSurfaceVariant,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                       ],
@@ -66,28 +67,32 @@ class SettingsItemWidget extends StatelessWidget {
                 ],
               ),
             ),
-            _buildTrailing(),
+            _buildTrailing(theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTrailing() {
+  Widget _buildTrailing(ThemeData theme) {
     switch (item.type) {
       case SettingsItemType.toggle:
-        return Switch(
-          value: item.isEnabled,
-          onChanged: onToggle,
-          activeThumbColor: AppColors.secondaryContainer,
-          activeTrackColor: AppColors.secondaryContainer,
-          inactiveThumbColor: AppColors.onSurface,
-          inactiveTrackColor: AppColors.surfaceContainerHighest,
+        return Transform.scale(
+          scale: 1.1,
+          child: Switch(
+            value: item.isEnabled,
+            onChanged: onToggle,
+            activeColor: theme.colorScheme.primary,
+            activeTrackColor: theme.colorScheme.primary.withOpacity(0.5),
+            inactiveThumbColor: theme.colorScheme.outline,
+            inactiveTrackColor: theme.colorScheme.surfaceContainerHighest,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
         );
       case SettingsItemType.navigation:
-        return const Icon(
+        return Icon(
           Icons.chevron_right,
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
           size: 18,
         );
       case SettingsItemType.info:
@@ -95,7 +100,7 @@ class SettingsItemWidget extends StatelessWidget {
           return Text(
             item.value!,
             style: AppTextStyles.bodySm.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           );
         }

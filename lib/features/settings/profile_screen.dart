@@ -86,10 +86,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {
             _isEditing = false;
           });
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Profile updated successfully'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: theme.colorScheme.secondary,
             ),
           );
         }
@@ -97,10 +98,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       print('Error updating profile: $e');
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update profile'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -130,135 +132,138 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _currentPasswordController.clear();
     _newPasswordController.clear();
     _confirmPasswordController.clear();
-    
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surfaceContainer,
-        title: Text(
-          'Change Password',
-          style: AppTextStyles.headlineSm.copyWith(
-            color: AppColors.onSurface,
-          ),
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _currentPasswordController,
-                obscureText: true,
-                style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'Current Password',
-                  prefixIcon: const Icon(Icons.lock),
-                  labelStyle: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surfaceContainerLow,
-                  border: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _newPasswordController,
-                obscureText: true,
-                style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'New Password',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.casino_outlined),
-                    onPressed: () {
-                      _newPasswordController.text = _generatePassword();
-                    },
-                  ),
-                  labelStyle: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surfaceContainerLow,
-                  border: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _confirmPasswordController,
-                obscureText: true,
-                style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'Confirm New Password',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  labelStyle: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.surfaceContainerLow,
-                  border: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.smRadius,
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          title: Text(
+            'Change Password',
+            style: AppTextStyles.headlineSm.copyWith(
+              color: theme.colorScheme.onSurface,
             ),
           ),
-          ElevatedButton(
-            onPressed: _handleChangePassword,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.onPrimary,
-            ),
-            child: Text(
-              'Update',
-              style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onPrimary,
-              ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _currentPasswordController,
+                  obscureText: true,
+                  style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
+                  decoration: InputDecoration(
+                    labelText: 'Current Password',
+                    prefixIcon: const Icon(Icons.lock),
+                    labelStyle: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    border: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _newPasswordController,
+                  obscureText: true,
+                  style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
+                  decoration: InputDecoration(
+                    labelText: 'New Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.casino_outlined),
+                      onPressed: () {
+                        _newPasswordController.text = _generatePassword();
+                      },
+                    ),
+                    labelStyle: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    border: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
+                  decoration: InputDecoration(
+                    labelText: 'Confirm New Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    labelStyle: AppTextStyles.bodySm.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    border: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: AppBorderRadius.smRadius,
+                      borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _handleChangePassword,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+              ),
+              child: Text(
+                'Update',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -299,25 +304,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           email: user.email!,
           password: _currentPasswordController.text,
         );
-        
+
         await user.reauthenticateWithCredential(credential);
-        
+
         // Update password in Firebase Auth
         await user.updatePassword(_newPasswordController.text);
-        
+
         Navigator.pop(context);
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Password updated successfully'),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: theme.colorScheme.secondary,
           ),
         );
       }
     } catch (e) {
+      final theme = Theme.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to update password: ${e.toString()}'),
-          backgroundColor: AppColors.error,
+          backgroundColor: theme.colorScheme.error,
         ),
       );
     }
@@ -325,19 +332,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: theme.colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.onSurface),
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Profile',
           style: AppTextStyles.headlineMd.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         actions: [
@@ -347,7 +355,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Text(
                 'Cancel',
                 style: AppTextStyles.bodyMd.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -356,7 +364,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Text(
               _isEditing ? 'Save' : 'Edit',
               style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -412,6 +420,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileHeader() {
+    final theme = Theme.of(context);
     final user = _authService.currentUser;
     return Column(
       children: [
@@ -419,7 +428,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -428,7 +437,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ? _nameController.text[0].toUpperCase()
                   : 'U',
               style: AppTextStyles.headlineLg.copyWith(
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 fontSize: 48,
               ),
             ),
@@ -438,14 +447,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Text(
           _nameController.text,
           style: AppTextStyles.headlineMd.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           user?.email ?? '',
           style: AppTextStyles.bodySm.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -456,20 +465,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String title,
     required List<Widget> children,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
           style: AppTextStyles.labelBadge.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
             letterSpacing: 0.1,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceSm),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: AppBorderRadius.defaultRadiusBorder,
           ),
           child: Padding(
@@ -489,13 +499,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required bool enabled,
     required IconData icon,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: AppTextStyles.bodySm.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 4),
@@ -503,14 +514,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           controller: controller,
           enabled: enabled,
           style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: AppColors.onSurfaceVariant),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
             filled: !enabled,
             fillColor: enabled
-                ? AppColors.surfaceContainerLow
-                : AppColors.surfaceContainerHigh,
+                ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.3)
+                : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
             border: OutlineInputBorder(
               borderRadius: AppBorderRadius.smRadius,
               borderSide: BorderSide.none,
@@ -521,7 +532,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: AppBorderRadius.smRadius,
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: AppBorderRadius.smRadius,
@@ -539,12 +550,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String description,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.spaceSm),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLow,
+          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
           borderRadius: AppBorderRadius.smRadius,
         ),
         child: Row(
@@ -553,12 +565,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainerHighest,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: AppBorderRadius.smRadius,
               ),
               child: Icon(
                 icon,
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 size: 20,
               ),
             ),
@@ -570,21 +582,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text(
                     title,
                     style: AppTextStyles.bodyMd.copyWith(
-                      color: AppColors.onSurface,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   Text(
                     description,
                     style: AppTextStyles.bodySm.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
               size: 18,
             ),
           ],

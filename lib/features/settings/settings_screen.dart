@@ -25,10 +25,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _vaultService = VaultService();
   final List<SettingsItem> _accountItems = [];
   final List<SettingsItem> _securityItems = [];
+  final List<SettingsItem> _appearanceItems = [];
   final List<SettingsItem> _dataItems = [];
   bool _isBiometricAvailable = false;
   bool _isBiometricEnabled = false;
   bool _isProcessingSubscription = false;
+  bool _colorsInitialized = false;
 
   String? get currentUserId => _authService.currentUser?.uid;
 
@@ -55,10 +57,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _updateBiometricItem() async {
-    final description = _isBiometricAvailable
-        ? await _biometricService.getBiometricDescription()
-        : 'Not available on this device';
+    String description;
 
+    if (!_isBiometricAvailable) {
+      description = 'Not available on this device';
+    } else if (_isBiometricEnabled) {
+      description = await _biometricService.getBiometricDescription();
+    } else {
+      description = 'Enable quick login with your fingerprint';
+    }
+
+    if (!mounted) return;
+    final theme = Theme.of(context);
     setState(() {
       final biometricIndex = _securityItems.indexWhere((item) => item.id == 'biometric');
       if (biometricIndex != -1) {
@@ -67,9 +77,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: 'Biometric Unlock',
           description: description,
           icon: Icons.fingerprint,
-          iconColor: AppColors.primary,
+          iconColor: theme.colorScheme.primary,
           type: SettingsItemType.toggle,
           isEnabled: _isBiometricEnabled,
+        );
+      }
+    });
+  }
+
+  void _updateThemeItem() {
+    if (!mounted) return;
+    final theme = Theme.of(context);
+    setState(() {
+      final themeIndex = _appearanceItems.indexWhere((item) => item.id == 'theme');
+      if (themeIndex != -1) {
+        _appearanceItems[themeIndex] = SettingsItem(
+          id: 'theme',
+          title: 'Theme',
+          description: _getThemeDescription(),
+          icon: Icons.brightness_6,
+          iconColor: theme.colorScheme.tertiary,
+          type: SettingsItemType.navigation,
         );
       }
     });
@@ -82,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: 'Profile',
         description: 'Manage your account information',
         icon: Icons.person,
-        iconColor: AppColors.primary,
+        iconColor: Colors.blue, // Temporary, will be updated in _initializeColors
         type: SettingsItemType.navigation,
       ),
       SettingsItem(
@@ -90,7 +118,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: 'Subscription',
         description: 'Manage your premium subscription',
         icon: Icons.card_membership,
-        iconColor: AppColors.secondary,
+        iconColor: Colors.green, // Temporary, will be updated in _initializeColors
         type: SettingsItemType.navigation,
       ),
       SettingsItem(
@@ -98,7 +126,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: 'Logout',
         description: 'Sign out of your account',
         icon: Icons.logout,
-        iconColor: AppColors.error,
+        iconColor: Colors.red, // Temporary, will be updated in _initializeColors
         type: SettingsItemType.action,
       ),
     ]);
@@ -109,9 +137,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: 'Biometric Unlock',
         description: 'Checking availability...',
         icon: Icons.fingerprint,
-        iconColor: AppColors.primary,
+        iconColor: Colors.blue, // Temporary, will be updated in _initializeColors
         type: SettingsItemType.toggle,
         isEnabled: _isBiometricEnabled,
+      ),
+    ]);
+
+    _appearanceItems.addAll([
+      SettingsItem(
+        id: 'theme',
+        title: 'Theme',
+        description: _getThemeDescription(),
+        icon: Icons.brightness_6,
+        iconColor: Colors.purple, // Temporary, will be updated in _initializeColors
+        type: SettingsItemType.navigation,
       ),
     ]);
 
@@ -121,10 +160,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: 'Delete All Data',
         description: 'Permanently delete all vault data',
         icon: Icons.delete_forever,
-        iconColor: AppColors.error,
+        iconColor: Colors.red, // Temporary, will be updated in _initializeColors
         type: SettingsItemType.navigation,
       ),
     ]);
+  }
+
+  String _getThemeDescription() {
+    final themeMode = ThemeService.instance.themeMode;
+    switch (themeMode) {
+      case ThemeMode.light:
+        return 'Light mode';
+      case ThemeMode.dark:
+        return 'Dark mode';
+      case ThemeMode.system:
+        return 'Follow system';
+    }
+  }
+
+  void _initializeColors() {
+    if (_colorsInitialized) return;
+    final theme = Theme.of(context);
+    setState(() {
+      _accountItems[0] = _accountItems[0].copyWith(iconColor: theme.colorScheme.primary);
+      _accountItems[1] = _accountItems[1].copyWith(iconColor: theme.colorScheme.secondary);
+      _accountItems[2] = _accountItems[2].copyWith(iconColor: theme.colorScheme.error);
+      _securityItems[0] = _securityItems[0].copyWith(iconColor: theme.colorScheme.primary);
+      _appearanceItems[0] = _appearanceItems[0].copyWith(
+        iconColor: theme.colorScheme.tertiary,
+        description: _getThemeDescription(),
+      );
+      _dataItems[0] = _dataItems[0].copyWith(iconColor: theme.colorScheme.error);
+      _colorsInitialized = true;
+    });
   }
 
   void _handleItemTap(String itemId) async {
@@ -150,6 +218,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (itemId == 'delete') {
       await _handleDeleteData();
+      return;
+    }
+
+    if (itemId == 'theme') {
+      await _handleThemeSelection();
       return;
     }
 
@@ -207,6 +280,129 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _handleThemeSelection() async {
+    final themeMode = ThemeService.instance.themeMode;
+    final selected = await showDialog<ThemeMode>(
+      context: context,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          title: Text(
+            'Select Theme',
+            style: AppTextStyles.headlineSm.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildThemeOption(
+                title: 'Light',
+                icon: Icons.light_mode,
+                themeMode: ThemeMode.light,
+                currentThemeMode: themeMode,
+              ),
+              const SizedBox(height: 8),
+              _buildThemeOption(
+                title: 'Dark',
+                icon: Icons.dark_mode,
+                themeMode: ThemeMode.dark,
+                currentThemeMode: themeMode,
+              ),
+              const SizedBox(height: 8),
+              _buildThemeOption(
+                title: 'System',
+                icon: Icons.brightness_auto,
+                themeMode: ThemeMode.system,
+                currentThemeMode: themeMode,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selected != null) {
+      await ThemeService.instance.setThemeMode(selected);
+      setState(() {
+        _appearanceItems[0] = _appearanceItems[0].copyWith(
+          description: _getThemeDescription(),
+        );
+      });
+    }
+  }
+
+  Widget _buildThemeOption({
+    required String title,
+    required IconData icon,
+    required ThemeMode themeMode,
+    required ThemeMode currentThemeMode,
+  }) {
+    final theme = Theme.of(context);
+    final isSelected = themeMode == currentThemeMode;
+
+    return InkWell(
+      onTap: () => Navigator.pop(context, themeMode),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primaryContainer
+              : Colors.transparent,
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: AppTextStyles.bodyMd.copyWith(
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected)
+              Icon(
+                Icons.check,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _handleDeleteData() async {
     // Check biometric status
     final isBiometricEnabled = await _biometricService.isBiometricEnabled();
@@ -220,10 +416,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       } catch (e) {
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Biometric authentication failed: ${e.toString().replaceAll('Exception: ', '')}'),
-              backgroundColor: AppColors.error,
+              backgroundColor: theme.colorScheme.error,
               duration: const Duration(seconds: 3),
             ),
           );
@@ -254,10 +451,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       } catch (e) {
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Password verification failed'),
-              backgroundColor: AppColors.error,
+              backgroundColor: theme.colorScheme.error,
               duration: const Duration(seconds: 3),
             ),
           );
@@ -268,10 +466,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (!isVerified) {
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Verification failed'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -282,42 +481,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Show final confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surfaceContainer,
-        title: Text(
-          'Delete All Data',
-          style: AppTextStyles.headlineSm.copyWith(
-            color: AppColors.onSurface,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to permanently delete all vault data? This action cannot be undone.',
-          style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurfaceVariant,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Cancel',
-              style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          title: Text(
+            'Delete All Data',
+            style: AppTextStyles.headlineSm.copyWith(
+              color: theme.colorScheme.onSurface,
             ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              'Delete',
-              style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.error,
-                fontWeight: FontWeight.w600,
-              ),
+          content: Text(
+            'Are you sure you want to permanently delete all vault data? This action cannot be undone.',
+            style: AppTextStyles.bodyMd.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(
+                'Delete',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: theme.colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed == true && mounted) {
@@ -326,19 +528,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await _deleteAllVaultData();
 
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('All data deleted successfully'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: theme.colorScheme.secondary,
             ),
           );
         }
       } catch (e) {
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to delete data: $e'),
-              backgroundColor: AppColors.error,
+              backgroundColor: theme.colorScheme.error,
             ),
           );
         }
@@ -364,42 +568,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _handleLogout() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surfaceContainer,
-        title: Text(
-          'Logout',
-          style: AppTextStyles.headlineSm.copyWith(
-            color: AppColors.onSurface,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to logout?',
-          style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurfaceVariant,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              'Cancel',
-              style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+          title: Text(
+            'Logout',
+            style: AppTextStyles.headlineSm.copyWith(
+              color: theme.colorScheme.onSurface,
             ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              'Logout',
-              style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.error,
-                fontWeight: FontWeight.w600,
-              ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: AppTextStyles.bodyMd.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(
+                'Logout',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: theme.colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed == true && mounted) {
@@ -409,10 +616,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
         await _authService.signOut();
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Logged out successfully'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: theme.colorScheme.secondary,
             ),
           );
           // Navigate to login screen
@@ -420,10 +628,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       } catch (e) {
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Logout failed: $e'),
-              backgroundColor: AppColors.error,
+              backgroundColor: theme.colorScheme.error,
             ),
           );
         }
@@ -461,10 +670,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           });
 
           if (mounted) {
+            final theme = Theme.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Biometric authentication failed'),
-                backgroundColor: AppColors.error,
+                backgroundColor: theme.colorScheme.error,
                 duration: const Duration(seconds: 3),
               ),
             );
@@ -479,10 +689,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
 
         if (mounted) {
+          final theme = Theme.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(e.toString().replaceAll('Exception: ', '')),
-              backgroundColor: AppColors.error,
+              backgroundColor: theme.colorScheme.error,
               duration: const Duration(seconds: 4),
             ),
           );
@@ -490,15 +701,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return;
       }
 
-      // After successful biometric auth, prompt user to enter credentials to save
+      // After successful biometric auth, prompt user to enter password to save
       if (mounted) {
+        final user = _authService.currentUser;
+        if (user == null) {
+          if (mounted) {
+            final theme = Theme.of(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('User not authenticated'),
+                backgroundColor: theme.colorScheme.error,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+          setState(() {
+            _isBiometricEnabled = false;
+            _updateItemState('biometric', false);
+          });
+          return;
+        }
+
         final result = await showDialog<bool>(
           context: context,
-          builder: (context) => _CredentialInputDialog(),
+          builder: (context) => _CredentialInputDialog(email: user.email!),
         );
 
         if (result == true) {
-          // User entered credentials, enable biometric
+          // User entered password, enable biometric
           setState(() {
             _isBiometricEnabled = true;
             _updateItemState('biometric', true);
@@ -506,10 +736,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           await _biometricService.setBiometricEnabled(true);
 
           if (mounted) {
+            final theme = Theme.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Biometric unlock enabled! You can now use fingerprint to login.'),
-                backgroundColor: AppColors.secondary,
+                backgroundColor: theme.colorScheme.secondary,
                 duration: const Duration(seconds: 3),
               ),
             );
@@ -535,10 +766,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await _biometricService.setBiometricEnabled(false);
 
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Biometric unlock disabled'),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: theme.colorScheme.secondary,
           ),
         );
       }
@@ -576,6 +808,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
 
+      final appearanceIndex = _appearanceItems.indexWhere((item) => item.id == itemId);
+      if (appearanceIndex != -1) {
+        _appearanceItems[appearanceIndex] = SettingsItem(
+          id: _appearanceItems[appearanceIndex].id,
+          title: _appearanceItems[appearanceIndex].title,
+          description: _appearanceItems[appearanceIndex].description,
+          icon: _appearanceItems[appearanceIndex].icon,
+          iconColor: _appearanceItems[appearanceIndex].iconColor,
+          type: _appearanceItems[appearanceIndex].type,
+          isEnabled: value,
+          value: _appearanceItems[appearanceIndex].value,
+        );
+      }
+
       final dataIndex = _dataItems.indexWhere((item) => item.id == itemId);
       if (dataIndex != -1) {
         _dataItems[dataIndex] = SettingsItem(
@@ -594,8 +840,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    _initializeColors();
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lateralSafeMargin),
@@ -619,6 +867,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: AppSpacing.spaceMd),
               SettingsSection(
+                title: 'Appearance',
+                items: _appearanceItems,
+                onItemTap: _handleItemTap,
+                onToggle: _handleToggle,
+              ),
+              const SizedBox(height: AppSpacing.spaceMd),
+              SettingsSection(
                 title: 'Data',
                 items: _dataItems,
                 onItemTap: _handleItemTap,
@@ -635,6 +890,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildHeader() {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -644,12 +900,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.lock,
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 size: 18,
               ),
             ),
@@ -662,7 +918,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Text(
                       'PassBox',
                       style: AppTextStyles.headlineSm.copyWith(
-                        color: AppColors.onSurface,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -672,7 +928,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withOpacity(0.1),
+                        color: theme.colorScheme.secondary.withOpacity(0.1),
                         borderRadius: AppBorderRadius.fullRadius,
                       ),
                       child: Row(
@@ -680,8 +936,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Container(
                             width: 6,
                             height: 6,
-                            decoration: const BoxDecoration(
-                              color: AppColors.secondary,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.secondary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -689,7 +945,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Text(
                             'Locked',
                             style: AppTextStyles.labelBadge.copyWith(
-                              color: AppColors.secondary,
+                              color: theme.colorScheme.secondary,
                             ),
                           ),
                         ],
@@ -700,7 +956,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Text(
                   'Settings',
                   style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -713,9 +969,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: () {
                 // TODO: Implement sync
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.sync,
-                color: AppColors.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(width: 4),
@@ -723,12 +979,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.primary,
+                color: theme.colorScheme.primary,
                 borderRadius: AppBorderRadius.fullRadius,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person,
-                color: AppColors.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 size: 18,
               ),
             ),
@@ -740,20 +996,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
 }
 
 class _CredentialInputDialog extends StatefulWidget {
+  final String email;
+
+  const _CredentialInputDialog({required this.email});
+
   @override
   State<_CredentialInputDialog> createState() => _CredentialInputDialogState();
 }
 
 class _CredentialInputDialogState extends State<_CredentialInputDialog> {
-  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _credentialStorage = CredentialStorageService();
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
-    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -765,7 +1028,7 @@ class _CredentialInputDialogState extends State<_CredentialInputDialog> {
 
     try {
       await _credentialStorage.saveCredentials(
-        _emailController.text.trim(),
+        widget.email,
         _passwordController.text,
       );
 
@@ -776,10 +1039,11 @@ class _CredentialInputDialogState extends State<_CredentialInputDialog> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to save credentials: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: theme.colorScheme.error,
           ),
         );
       }
@@ -788,12 +1052,13 @@ class _CredentialInputDialogState extends State<_CredentialInputDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AlertDialog(
-      backgroundColor: AppColors.surfaceContainer,
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
       title: Text(
-        'Save Credentials for Biometric Login',
+        'Enable Fingerprint Login',
         style: AppTextStyles.headlineSm.copyWith(
-          color: AppColors.onSurface,
+          color: theme.colorScheme.onSurface,
         ),
       ),
       content: SingleChildScrollView(
@@ -802,50 +1067,55 @@ class _CredentialInputDialogState extends State<_CredentialInputDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Icon(
+                Icons.fingerprint,
+                size: 48,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(height: AppSpacing.spaceMd),
               Text(
-                'Enter your email and password to enable biometric login.',
+                'Enter your password to enable quick login with your fingerprint.',
+                textAlign: TextAlign.center,
                 style: AppTextStyles.bodySm.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: AppSpacing.spaceMd),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  labelStyle: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.background,
-                  border: OutlineInputBorder(
-                    borderRadius: AppBorderRadius.defaultRadiusBorder,
-                    borderSide: BorderSide.none,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.spaceMd),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainer,
+                  borderRadius: AppBorderRadius.defaultRadiusBorder,
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      size: 20,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: AppSpacing.spaceSm),
+                    Expanded(
+                      child: Text(
+                        widget.email,
+                        style: AppTextStyles.bodyMd.copyWith(
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSpacing.spaceMd),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+                style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'Password',
                   prefixIcon: const Icon(Icons.lock_outlined),
                   filled: true,
-                  fillColor: AppColors.background,
+                  fillColor: theme.colorScheme.background,
                   border: OutlineInputBorder(
                     borderRadius: AppBorderRadius.defaultRadiusBorder,
                     borderSide: BorderSide.none,
@@ -868,29 +1138,29 @@ class _CredentialInputDialogState extends State<_CredentialInputDialog> {
           child: Text(
             'Cancel',
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _saveCredentials,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: AppColors.onPrimary,
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
           ),
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   height: 16,
                   width: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
+                    valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.onPrimary),
                   ),
                 )
               : Text(
-                  'Save',
+                  'Enable',
                   style: AppTextStyles.bodyMd.copyWith(
-                    color: AppColors.onPrimary,
+                    color: theme.colorScheme.onPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -918,12 +1188,13 @@ class _PasswordInputDialogState extends State<_PasswordInputDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AlertDialog(
-      backgroundColor: AppColors.surfaceContainer,
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
       title: Text(
         'Verify Password',
         style: AppTextStyles.headlineSm.copyWith(
-          color: AppColors.onSurface,
+          color: theme.colorScheme.onSurface,
         ),
       ),
       content: SingleChildScrollView(
@@ -935,19 +1206,19 @@ class _PasswordInputDialogState extends State<_PasswordInputDialog> {
               Text(
                 'Enter your password to verify your identity.',
                 style: AppTextStyles.bodySm.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: AppSpacing.spaceMd),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                style: AppTextStyles.bodyMd.copyWith(color: AppColors.onSurface),
+                style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'Password',
                   prefixIcon: const Icon(Icons.lock_outlined),
                   filled: true,
-                  fillColor: AppColors.background,
+                  fillColor: theme.colorScheme.background,
                   border: OutlineInputBorder(
                     borderRadius: AppBorderRadius.defaultRadiusBorder,
                     borderSide: BorderSide.none,
@@ -970,7 +1241,7 @@ class _PasswordInputDialogState extends State<_PasswordInputDialog> {
           child: Text(
             'Cancel',
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -983,7 +1254,7 @@ class _PasswordInputDialogState extends State<_PasswordInputDialog> {
           child: Text(
             'Verify',
             style: AppTextStyles.bodyMd.copyWith(
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
           ),

@@ -19,19 +19,20 @@ class SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
           style: AppTextStyles.headlineSm.copyWith(
-            color: AppColors.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: AppSpacing.spaceXs),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: AppBorderRadius.lgRadius,
             boxShadow: AppShadows.cardElevation,
           ),
@@ -51,7 +52,7 @@ class SettingsSection extends StatelessWidget {
                     Divider(
                       height: 1,
                       thickness: 1,
-                      color: AppColors.surfaceContainerHigh,
+                      color: theme.colorScheme.surfaceContainerHighest,
                     ),
                 ],
               );

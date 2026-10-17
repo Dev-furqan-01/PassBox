@@ -7,7 +7,7 @@ import 'widgets/items_search_bar.dart';
 import 'widgets/credential_row.dart';
 import '../vault/vault_service.dart';
 import '../vault/models/vault.dart' as VaultModel;
-import '../vault/add_item_screen.dart';
+import '../vault/add_item_screen_responsive.dart';
 import '../auth/auth_service.dart';
 
 class ItemsScreen extends StatefulWidget {
@@ -87,23 +87,23 @@ class _ItemsScreenState extends State<ItemsScreen> {
             label: 'Favorites',
             count: vaults.where((v) => v.isFavorite).length,
             icon: Icons.star,
-            iconColor: AppColors.tertiary,
+            iconColor: Theme.of(context).colorScheme.tertiary,
           ),
           FilterOption(
             id: 'weak',
             label: 'Weak',
             count: weakVaults.length,
             showDot: true,
-            dotColor: AppColors.tertiary,
-            countColor: AppColors.tertiaryContainer.withOpacity(0.3),
-            countTextColor: AppColors.tertiary,
+            dotColor: Theme.of(context).colorScheme.tertiary,
+            countColor: Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.3),
+            countTextColor: Theme.of(context).colorScheme.tertiary,
           ),
           FilterOption(
             id: 'compromised',
             label: 'Compromised',
             count: 0,
             showDot: true,
-            dotColor: AppColors.secondary,
+            dotColor: Theme.of(context).colorScheme.secondary,
           ),
         ];
         _isLoading = false;
@@ -167,7 +167,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Password copied to clipboard'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: Theme.of(context).colorScheme.secondary,
               duration: Duration(seconds: 2),
             ),
           );
@@ -179,7 +179,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to copy password'),
-            backgroundColor: AppColors.error,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -189,7 +189,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
   void _showOptionsMenu(CredentialItem item) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surfaceContainer,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppBorderRadius.lg),
@@ -204,16 +204,16 @@ class _ItemsScreenState extends State<ItemsScreen> {
               height: 4,
               margin: EdgeInsets.symmetric(vertical: AppSpacing.spaceSm),
               decoration: BoxDecoration(
-                color: AppColors.onSurfaceVariant.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.3),
                 borderRadius: AppBorderRadius.fullRadius,
               ),
             ),
             ListTile(
-              leading: Icon(Icons.edit, color: AppColors.primary),
+              leading: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
               title: Text(
                 'Edit',
                 style: AppTextStyles.bodyMd.copyWith(
-                  color: AppColors.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               onTap: () {
@@ -222,11 +222,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.delete, color: AppColors.error),
+              leading: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
               title: Text(
                 'Delete',
                 style: AppTextStyles.bodyMd.copyWith(
-                  color: AppColors.onSurface,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               onTap: () {
@@ -242,30 +242,43 @@ class _ItemsScreenState extends State<ItemsScreen> {
   }
 
   Future<void> _handleEdit(CredentialItem item) async {
-    // TODO: Navigate to edit screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Edit feature coming soon for ${item.service}'),
-        backgroundColor: AppColors.caution,
-      ),
-    );
+    try {
+      final vault = await _vaultService.getVault(item.id);
+      if (vault != null && mounted) {
+        await AddItemScreenResponsive.show(
+          context,
+          vaultToEdit: vault,
+        );
+        _loadData();
+      }
+    } catch (e) {
+      print('Error loading vault for edit: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load item for editing'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _handleDelete(CredentialItem item) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surfaceContainer,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         title: Text(
           'Delete ${item.service}?',
           style: AppTextStyles.headlineSm.copyWith(
-            color: AppColors.onSurface,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         content: Text(
           'This action cannot be undone. Are you sure you want to delete this credential?',
           style: AppTextStyles.bodyMd.copyWith(
-            color: AppColors.onSurfaceVariant,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         actions: [
@@ -274,7 +287,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             child: Text(
               'Cancel',
               style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -283,7 +296,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
             child: Text(
               'Delete',
               style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.error,
+                color: Theme.of(context).colorScheme.error,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -300,7 +313,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('${item.service} deleted successfully'),
-              backgroundColor: AppColors.secondary,
+              backgroundColor: Theme.of(context).colorScheme.secondary,
             ),
           );
         }
@@ -310,7 +323,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to delete item'),
-              backgroundColor: AppColors.error,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -435,7 +448,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(item.isFavorite ? 'Removed from favorites' : 'Added to favorites'),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: Theme.of(context).colorScheme.secondary,
             duration: Duration(seconds: 2),
           ),
         );
@@ -448,7 +461,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update favorite status'),
-            backgroundColor: AppColors.error,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -463,8 +476,9 @@ class _ItemsScreenState extends State<ItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -541,16 +555,11 @@ class _ItemsScreenState extends State<ItemsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddItemScreen(),
-            ),
-          );
+          await AddItemScreenResponsive.show(context);
           _loadData();
         },
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.onPrimary,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
         elevation: 4,
         child: const Icon(Icons.add),
       ),

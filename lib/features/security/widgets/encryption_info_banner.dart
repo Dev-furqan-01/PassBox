@@ -6,9 +6,10 @@ class EncryptionInfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: theme.colorScheme.surfaceContainerLow,
         borderRadius: AppBorderRadius.lgRadius,
       ),
       padding: const EdgeInsets.all(AppSpacing.spaceMd),
@@ -16,7 +17,7 @@ class EncryptionInfoBanner extends StatelessWidget {
         children: [
           Icon(
             Icons.lock,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             size: 20,
           ),
           const SizedBox(width: AppSpacing.spaceSm),
@@ -27,13 +28,13 @@ class EncryptionInfoBanner extends StatelessWidget {
                 Text(
                   'AES-256-GCM + XChaCha20',
                   style: AppTextStyles.labelCodeMd.copyWith(
-                    color: AppColors.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 Text(
                   'Zero-knowledge local derivation active.',
                   style: AppTextStyles.bodySm.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

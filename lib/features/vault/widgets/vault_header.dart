@@ -3,20 +3,19 @@ import '../../../core/core.dart';
 
 class VaultHeader extends StatelessWidget {
   final String userName;
-  final VoidCallback onLockTap;
   final VoidCallback onNotificationTap;
   final bool hasUnreadNotifications;
 
   const VaultHeader({
     super.key,
     required this.userName,
-    required this.onLockTap,
     required this.onNotificationTap,
     this.hasUnreadNotifications = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lateralSafeMargin,
@@ -34,15 +33,15 @@ class VaultHeader extends StatelessWidget {
                       child: Text(
                         'Good evening, $userName',
                         style: AppTextStyles.headlineMd.copyWith(
-                          color: AppColors.onSurface,
+                          color: theme.colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.spaceXs),
-                    const Icon(
+                    Icon(
                       Icons.verified,
-                      color: AppColors.primary,
+                      color: theme.colorScheme.primary,
                       size: 18,
                     ),
                   ],
@@ -61,7 +60,7 @@ class VaultHeader extends StatelessWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: AppColors.secondary.withOpacity(0.75),
+                              color: theme.colorScheme.secondary.withOpacity(0.75),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -73,7 +72,7 @@ class VaultHeader extends StatelessWidget {
                       child: Text(
                         'ENTERPRISE SHIELD ACTIVE',
                         style: AppTextStyles.labelBadge.copyWith(
-                          color: AppColors.secondary,
+                          color: theme.colorScheme.secondary,
                           letterSpacing: 0.1,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -85,34 +84,25 @@ class VaultHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.spaceSm),
-          Row(
+          Stack(
             children: [
               _ActionButton(
-                icon: Icons.lock,
-                onTap: onLockTap,
+                icon: Icons.notifications,
+                onTap: onNotificationTap,
               ),
-              const SizedBox(width: AppSpacing.spaceXs),
-              Stack(
-                children: [
-                  _ActionButton(
-                    icon: Icons.notifications,
-                    onTap: onNotificationTap,
-                  ),
-                  if (hasUnreadNotifications)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.tertiary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
+              if (hasUnreadNotifications)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.tertiary,
+                      shape: BoxShape.circle,
                     ),
-                ],
-              ),
+                  ),
+                ),
             ],
           ),
         ],
@@ -132,19 +122,20 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainer,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.defaultRadiusBorder,
           boxShadow: AppShadows.cardElevation,
         ),
         child: Icon(
           icon,
-          color: AppColors.onSurfaceVariant,
+          color: theme.colorScheme.onSurfaceVariant,
           size: 20,
         ),
       ),
@@ -184,12 +175,13 @@ class _PulseAnimationState extends State<_PulseAnimation>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.secondary.withOpacity(_animation.value * 0.3),
+            color: theme.colorScheme.secondary.withOpacity(_animation.value * 0.3),
             shape: BoxShape.circle,
           ),
         );

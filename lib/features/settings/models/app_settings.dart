@@ -20,6 +20,28 @@ class SettingsItem {
     this.isEnabled = false,
     this.value,
   });
+
+  SettingsItem copyWith({
+    String? id,
+    String? title,
+    String? description,
+    IconData? icon,
+    Color? iconColor,
+    SettingsItemType? type,
+    bool? isEnabled,
+    String? value,
+  }) {
+    return SettingsItem(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      icon: icon ?? this.icon,
+      iconColor: iconColor ?? this.iconColor,
+      type: type ?? this.type,
+      isEnabled: isEnabled ?? this.isEnabled,
+      value: value ?? this.value,
+    );
+  }
 }
 
 enum SettingsItemType {

@@ -19,35 +19,36 @@ class ItemsSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lateralSafeMargin,
         vertical: AppSpacing.spaceXs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surface.withOpacity(0.95),
+        color: theme.colorScheme.surface.withOpacity(0.95),
       ),
       child: Column(
         children: [
           Container(
             height: 44,
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: AppBorderRadius.defaultRadiusBorder,
             ),
             child: TextField(
               onChanged: onChanged,
               style: AppTextStyles.bodyMd.copyWith(
-                color: AppColors.onSurface,
+                color: theme.colorScheme.onSurface,
               ),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle: AppTextStyles.bodyMd.copyWith(
-                  color: AppColors.outline,
+                  color: theme.colorScheme.outline,
                 ),
-                prefixIcon: const Icon(
+                prefixIcon: Icon(
                   Icons.search,
-                  color: AppColors.outline,
+                  color: theme.colorScheme.outline,
                   size: 20,
                 ),
                 border: InputBorder.none,
@@ -100,6 +101,7 @@ class _FilterPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -109,8 +111,8 @@ class _FilterPill extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryContainer
-              : AppColors.surfaceContainer,
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.surfaceContainerHighest,
           borderRadius: AppBorderRadius.fullRadius,
         ),
         child: Row(
@@ -138,8 +140,8 @@ class _FilterPill extends StatelessWidget {
               filter.label,
               style: AppTextStyles.labelBadge.copyWith(
                 color: isSelected
-                    ? AppColors.onPrimaryContainer
-                    : AppColors.onSurface,
+                    ? theme.colorScheme.onPrimaryContainer
+                    : theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(width: 6),
@@ -150,16 +152,16 @@ class _FilterPill extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.onPrimaryContainer.withOpacity(0.2)
-                    : (filter.countColor ?? AppColors.surfaceVariant),
+                    ? theme.colorScheme.onPrimaryContainer.withOpacity(0.2)
+                    : (filter.countColor ?? theme.colorScheme.surface),
                 borderRadius: AppBorderRadius.fullRadius,
               ),
               child: Text(
                 filter.count.toString(),
                 style: AppTextStyles.labelBadge.copyWith(
                   color: isSelected
-                      ? AppColors.onPrimaryContainer
-                      : (filter.countTextColor ?? AppColors.onSurfaceVariant),
+                      ? theme.colorScheme.onPrimaryContainer
+                      : (filter.countTextColor ?? theme.colorScheme.onSurfaceVariant),
                 ),
               ),
             ),
