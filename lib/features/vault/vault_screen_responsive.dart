@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/core.dart';
-import '../../../core/services/admob_service.dart';
 import 'models/vault_item.dart';
 import 'widgets/vault_header.dart';
 import 'widgets/search_bar.dart';
@@ -31,8 +30,6 @@ class _VaultScreenResponsiveState extends State<VaultScreenResponsive> {
   final TextEditingController _searchController = TextEditingController();
   final VaultService _vaultService = VaultService();
   final AuthService _authService = AuthService();
-  final _adMobService = AdMobService();
-  Timer? _bannerRefreshTimer;
   Timer? _searchDebounce;
 
   List<VaultItem> _favoriteItems = [];
@@ -49,14 +46,6 @@ class _VaultScreenResponsiveState extends State<VaultScreenResponsive> {
   void initState() {
     super.initState();
     _loadData();
-    _adMobService.loadBannerAd();
-    _startBannerRefreshTimer();
-  }
-
-  void _startBannerRefreshTimer() {
-    _bannerRefreshTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
-      _adMobService.loadBannerAd();
-    });
   }
 
   Future<void> _reloadData() async {
@@ -199,10 +188,8 @@ class _VaultScreenResponsiveState extends State<VaultScreenResponsive> {
 
   @override
   void dispose() {
-    _bannerRefreshTimer?.cancel();
     _searchDebounce?.cancel();
     _searchController.dispose();
-    _adMobService.dispose();
     super.dispose();
   }
 

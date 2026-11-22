@@ -44,13 +44,13 @@ class _VaultScreenState extends State<VaultScreen> {
   void initState() {
     super.initState();
     _loadData();
-    _adMobService.loadBannerAd();
+    _adMobService.loadBannerAd(slot: AdMobService.vaultBannerSlot);
     _startBannerRefreshTimer();
   }
 
   void _startBannerRefreshTimer() {
     _bannerRefreshTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
-      _adMobService.loadBannerAd();
+      _adMobService.loadBannerAd(slot: AdMobService.vaultBannerSlot, force: true);
     });
   }
 
@@ -203,7 +203,6 @@ class _VaultScreenState extends State<VaultScreen> {
     _bannerRefreshTimer?.cancel();
     _searchDebounce?.cancel();
     _searchController.dispose();
-    _adMobService.dispose();
     super.dispose();
   }
 
@@ -407,12 +406,19 @@ class _VaultScreenState extends State<VaultScreen> {
                           ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           // Banner Ad
-                          if (_adMobService.isBannerLoaded)
-                            Container(
-                              alignment: Alignment.center,
-                              height: 50,
-                              child: _adMobService.getBannerAdWidget(),
-                            ),
+                          AnimatedBuilder(
+                            animation: _adMobService,
+                            builder: (context, _) {
+                              if (!_adMobService.isBannerLoaded(AdMobService.vaultBannerSlot)) {
+                                return const SizedBox.shrink();
+                              }
+                              return Container(
+                                alignment: Alignment.center,
+                                height: 50,
+                                child: _adMobService.getBannerAdWidget(AdMobService.vaultBannerSlot),
+                              );
+                            },
+                          ),
                           const SizedBox(height: AppSpacing.spaceMd),
                           _buildPinnedFavorites(),
                           const SizedBox(height: AppSpacing.spaceMd),

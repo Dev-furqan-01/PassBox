@@ -2,34 +2,47 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class AdMobService {
+class AdMobService extends ChangeNotifier {
   static final AdMobService _instance = AdMobService._internal();
   factory AdMobService() => _instance;
   AdMobService._internal();
 
   InterstitialAd? _interstitialAd;
-  BannerAd? _bannerAd;
+  final Map<String, BannerAd> _bannerAds = {};
+  final Map<String, bool> _bannerLoaded = {};
+  final Set<String> _bannerLoading = {};
   bool _isInterstitialLoaded = false;
-  bool _isBannerLoaded = false;
   bool _isAdShowing = false;
   bool _isLoadingAd = false;
 
-  // Test interstitial ad unit ID (use this during development)
-  static const String _testInterstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
+  // Banner slots
+  static const String vaultBannerSlot = 'vault';
+  static const String generateBannerSlot = 'generate';
 
-  // Test banner ad unit ID (use this during development)
+  // Test ad unit IDs (use during development)
+  static const String _testInterstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
   static const String _testBannerAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
 
-  // Production interstitial ad unit ID (replace with your actual AdMob ID before release)
-  static const String _productionInterstitialAdUnitId = 'ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx';
+  // Production ad unit IDs
+  static const String _productionInterstitialAdUnitId = 'ca-app-pub-4348379947126050/2436009846';
+  static const String _productionVaultBannerAdUnitId = 'ca-app-pub-4348379947126050/1314499862';
+  static const String _productionGenerateBannerAdUnitId = 'ca-app-pub-4348379947126050/7688336521';
 
-  // Production banner ad unit ID (replace with your actual AdMob ID before release)
-  static const String _productionBannerAdUnitId = 'ca-app-pub-xxxxxxxxxxxxxxxx/xxxxxxxxxx';
+  // Current ad unit IDs (test IDs in debug, production IDs in release)
+  static String get _interstitialAdUnitId =>
+      kReleaseMode ? _productionInterstitialAdUnitId : _testInterstitialAdUnitId;
 
-  // Current ad unit IDs (use test IDs for both debug and release until production IDs are configured)
-  static const String _interstitialAdUnitId = _testInterstitialAdUnitId;
-
-  static const String _bannerAdUnitId = _testBannerAdUnitId;
+  static String _bannerAdUnitIdFor(String slot) {
+    if (!kReleaseMode) return _testBannerAdUnitId;
+    switch (slot) {
+      case vaultBannerSlot:
+        return _productionVaultBannerAdUnitId;
+      case generateBannerSlot:
+        return _productionGenerateBannerAdUnitId;
+      default:
+        return _productionVaultBannerAdUnitId;
+    }
+  }
 
   /// Initialize Mobile Ads SDK
   Future<void> initialize() async {
@@ -137,61 +150,79 @@ class AdMobService {
   bool get isInterstitialLoaded => _isInterstitialLoaded;
 
   /// Check if a banner ad is loaded and ready to show
-  bool get isBannerLoaded => _isBannerLoaded;
+  bool isBannerLoaded([String slot = vaultBannerSlot]) =>
+      _bannerLoaded[slot] ?? false;
 
-  /// Get the loaded banner ad widget
-  Widget? getBannerAdWidget() {
-    if (_bannerAd == null || !_isBannerLoaded) {
+  /// Get the loaded banner ad widget for a slot
+  Widget? getBannerAdWidget([String slot = vaultBannerSlot]) {
+    final ad = _bannerAds[slot];
+    if (ad == null || !(_bannerLoaded[slot] ?? false)) {
       return null;
     }
-    return AdWidget(ad: _bannerAd!);
+    return AdWidget(ad: ad);
   }
 
-  /// Load a banner ad
-  Future<void> loadBannerAd() async {
-    // Dispose existing banner ad before loading a new one
-    if (_bannerAd != null) {
-      _bannerAd!.dispose();
-      _bannerAd = null;
-      _isBannerLoaded = false;
+  /// Load a banner ad for the given slot.
+  /// Skips if the slot is already loaded (unless [force] is true) or a load
+  /// is already in progress.
+  Future<void> loadBannerAd({String slot = vaultBannerSlot, bool force = false}) async {
+    if (_bannerLoading.contains(slot)) {
+      debugPrint('Banner ad already loading for slot: $slot');
+      return;
     }
+    if (!force && (_bannerLoaded[slot] ?? false)) {
+      return;
+    }
+    _bannerLoading.add(slot);
 
-    debugPrint('Loading banner ad...');
+    // Dispose existing banner ad in this slot before loading a new one
+    _bannerAds[slot]?.dispose();
+    _bannerAds.remove(slot);
+    _bannerLoaded[slot] = false;
+    notifyListeners();
+
+    debugPrint('Loading banner ad for slot: $slot');
 
     try {
-      _bannerAd = BannerAd(
-        adUnitId: _bannerAdUnitId,
+      final ad = BannerAd(
+        adUnitId: _bannerAdUnitIdFor(slot),
         request: const AdRequest(),
         size: AdSize.banner,
         listener: BannerAdListener(
           onAdLoaded: (Ad ad) {
-            debugPrint('Banner ad loaded successfully');
-            _isBannerLoaded = true;
+            debugPrint('Banner ad loaded successfully ($slot)');
+            _bannerLoaded[slot] = true;
+            notifyListeners();
           },
           onAdFailedToLoad: (Ad ad, LoadAdError error) {
-            debugPrint('Banner ad failed to load: ${error.message}');
-            _isBannerLoaded = false;
+            debugPrint('Banner ad failed to load ($slot): ${error.message}');
+            _bannerLoaded[slot] = false;
             ad.dispose();
-            _bannerAd = null;
+            _bannerAds.remove(slot);
+            notifyListeners();
           },
           onAdOpened: (Ad ad) {
-            debugPrint('Banner ad opened');
+            debugPrint('Banner ad opened ($slot)');
           },
           onAdClosed: (Ad ad) {
-            debugPrint('Banner ad closed');
+            debugPrint('Banner ad closed ($slot)');
           },
         ),
       );
 
-      await _bannerAd!.load();
+      _bannerAds[slot] = ad;
+      await ad.load();
     } catch (e) {
-      debugPrint('Error loading banner ad: $e');
-      _isBannerLoaded = false;
-      _bannerAd = null;
+      debugPrint('Error loading banner ad ($slot): $e');
+      _bannerLoaded[slot] = false;
+      _bannerAds.remove(slot);
+    } finally {
+      _bannerLoading.remove(slot);
     }
   }
 
   /// Dispose of the current interstitial ad
+  @override
   void dispose() {
     _interstitialAd?.dispose();
     _interstitialAd = null;
@@ -199,8 +230,11 @@ class AdMobService {
     _isAdShowing = false;
     _isLoadingAd = false;
 
-    _bannerAd?.dispose();
-    _bannerAd = null;
-    _isBannerLoaded = false;
+    for (final ad in _bannerAds.values) {
+      ad.dispose();
+    }
+    _bannerAds.clear();
+    _bannerLoaded.clear();
+    super.dispose();
   }
 }

@@ -29,7 +29,8 @@ void main() async {
   await AdMobService().initialize();
   // Preload interstitial and banner ads
   AdMobService().loadInterstitialAd();
-  AdMobService().loadBannerAd();
+  AdMobService().loadBannerAd(slot: AdMobService.vaultBannerSlot);
+  AdMobService().loadBannerAd(slot: AdMobService.generateBannerSlot);
   runApp(const MyApp());
 }
 

@@ -30,3 +30,26 @@
 
 # Keep local auth classes
 -keep class io.flutter.plugins.localauth.** { *; }
+
+# Play Core (deferred components not used)
+-dontwarn com.google.android.play.core.**
+
+# AndroidX Startup
+-keep class androidx.startup.InitializationProvider { *; }
+-keep class * implements androidx.startup.AppInitializer { *; }
+-keep class * extends androidx.startup.Initializer { *; }
+
+# WorkManager
+-keep class androidx.work.** { *; }
+-keep class * extends androidx.work.ListenableWorker { *; }
+-dontwarn androidx.work.**
+
+# Room (used by WorkManager's WorkDatabase)
+-keep class androidx.room.** { *; }
+-keep class * extends androidx.room.RoomDatabase
+-keepclassmembers class * extends androidx.room.RoomDatabase { <init>(); }
+-dontwarn androidx.room.**
+
+# SQLite
+-keep class androidx.sqlite.** { *; }
+-dontwarn androidx.sqlite.**

@@ -35,7 +35,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
     _loadHistory();
     // Load banner ad (platform-specific)
     try {
-      _adMobService.loadBannerAd();
+      _adMobService.loadBannerAd(slot: AdMobService.generateBannerSlot);
       // Refresh banner every 60 seconds
       _startBannerRefreshTimer();
     } catch (e) {
@@ -47,7 +47,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
   void _startBannerRefreshTimer() {
     _bannerRefreshTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
       try {
-        _adMobService.loadBannerAd();
+        _adMobService.loadBannerAd(slot: AdMobService.generateBannerSlot, force: true);
       } catch (e) {
         // Silently fail on Ad refresh errors
         print('AdMob refresh failed: $e');
@@ -58,7 +58,6 @@ class _GenerateScreenState extends State<GenerateScreen> {
   @override
   void dispose() {
     _bannerRefreshTimer?.cancel();
-    _adMobService.dispose();
     super.dispose();
   }
 
@@ -541,10 +540,18 @@ class _GenerateScreenState extends State<GenerateScreen> {
               ),
             ),
             // Banner Ad - Positioned above bottom nav
-            Container(
-              alignment: Alignment.center,
-              height: 50, // Banner ads need fixed height
-              child: _adMobService.getBannerAdWidget(),
+            AnimatedBuilder(
+              animation: _adMobService,
+              builder: (context, _) {
+                if (!_adMobService.isBannerLoaded(AdMobService.generateBannerSlot)) {
+                  return const SizedBox.shrink();
+                }
+                return Container(
+                  alignment: Alignment.center,
+                  height: 50, // Banner ads need fixed height
+                  child: _adMobService.getBannerAdWidget(AdMobService.generateBannerSlot),
+                );
+              },
             ),
           ],
         ),
