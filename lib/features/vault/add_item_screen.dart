@@ -24,6 +24,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _iconController = TextEditingController();
+  final _notesController = TextEditingController();
 
   bool _isFavorite = false;
   bool _isLoading = false;
@@ -38,6 +39,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       _usernameController.text = widget.vaultToEdit!.username;
       _passwordController.text = widget.vaultToEdit!.password;
       _iconController.text = widget.vaultToEdit!.icon ?? '';
+      _notesController.text = widget.vaultToEdit!.notes ?? '';
       _isFavorite = widget.vaultToEdit!.isFavorite;
     }
   }
@@ -48,6 +50,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     _iconController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -78,6 +81,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
           password: _passwordController.text,
           icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
           isFavorite: _isFavorite,
+          notes: _notesController.text.trim(),
         );
       } else {
         // Create new vault
@@ -88,6 +92,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
           icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
           isFavorite: _isFavorite,
           version: 1,
+          notes: _notesController.text.trim(),
         );
       }
 
@@ -182,6 +187,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 _buildPasswordField(context),
                 const SizedBox(height: AppSpacing.spaceMd),
                 _buildIconField(context),
+                const SizedBox(height: AppSpacing.spaceMd),
+                _buildNotesField(context),
                 const SizedBox(height: AppSpacing.spaceMd),
                 _buildToggleOptions(context),
                 const SizedBox(height: AppSpacing.spaceXl),
@@ -478,6 +485,43 @@ class _AddItemScreenState extends State<AddItemScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNotesField(BuildContext context) {
+    final theme = Theme.of(context);
+    return TextFormField(
+      controller: _notesController,
+      minLines: 3,
+      maxLines: 5,
+      maxLength: 500,
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
+      decoration: InputDecoration(
+        labelText: 'Notes (Optional)',
+        hintText: 'Add any notes about this item',
+        prefixIcon: const Icon(Icons.note_outlined),
+        alignLabelWithHint: true,
+        labelStyle: AppTextStyles.bodySm.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        hintStyle: AppTextStyles.bodySm.copyWith(
+          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+        ),
+        filled: true,
+        fillColor: theme.colorScheme.surfaceContainer,
+        border: OutlineInputBorder(
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppBorderRadius.defaultRadiusBorder,
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+        ),
       ),
     );
   }

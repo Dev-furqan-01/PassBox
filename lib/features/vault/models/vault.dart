@@ -14,6 +14,7 @@ class Vault {
   final int passwordStrength; // 0-100
   final bool isPasswordReused;
   final String? passwordHash; // For reuse detection
+  final String? notes;
 
   Vault({
     required this.vaultId,
@@ -31,6 +32,7 @@ class Vault {
     this.passwordStrength = 0,
     this.isPasswordReused = false,
     this.passwordHash,
+    this.notes,
   });
 
   factory Vault.fromMap(Map<String, dynamic> data) {
@@ -56,6 +58,7 @@ class Vault {
       passwordStrength: data['passwordStrength'] ?? 0,
       isPasswordReused: data['isPasswordReused'] ?? false,
       passwordHash: data['passwordHash'],
+      notes: data['notes'],
     );
   }
 
@@ -76,6 +79,7 @@ class Vault {
       'passwordStrength': passwordStrength,
       'isPasswordReused': isPasswordReused,
       if (passwordHash != null) 'passwordHash': passwordHash,
+      if (notes != null && notes!.isNotEmpty) 'notes': notes,
     };
   }
 
@@ -95,6 +99,7 @@ class Vault {
     int? passwordStrength,
     bool? isPasswordReused,
     String? passwordHash,
+    String? notes,
   }) {
     return Vault(
       vaultId: vaultId ?? this.vaultId,
@@ -112,6 +117,7 @@ class Vault {
       passwordStrength: passwordStrength ?? this.passwordStrength,
       isPasswordReused: isPasswordReused ?? this.isPasswordReused,
       passwordHash: passwordHash ?? this.passwordHash,
+      notes: notes ?? this.notes,
     );
   }
 }

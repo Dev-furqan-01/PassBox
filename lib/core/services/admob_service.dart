@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -19,28 +18,17 @@ class AdMobService extends ChangeNotifier {
   static const String vaultBannerSlot = 'vault';
   static const String generateBannerSlot = 'generate';
 
-  // Test ad unit IDs (use during development)
-  static const String _testInterstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
-  static const String _testBannerAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
-
   // Production ad unit IDs
-  static const String _productionInterstitialAdUnitId = 'ca-app-pub-4348379947126050/2436009846';
-  static const String _productionVaultBannerAdUnitId = 'ca-app-pub-4348379947126050/1314499862';
-  static const String _productionGenerateBannerAdUnitId = 'ca-app-pub-4348379947126050/7688336521';
-
-  // Current ad unit IDs (test IDs in debug, production IDs in release)
-  static String get _interstitialAdUnitId =>
-      kReleaseMode ? _productionInterstitialAdUnitId : _testInterstitialAdUnitId;
+  static const String _interstitialAdUnitId = 'ca-app-pub-4348379947126050/2436009846';
+  static const String _vaultBannerAdUnitId = 'ca-app-pub-4348379947126050/1314499862';
+  static const String _generateBannerAdUnitId = 'ca-app-pub-4348379947126050/7688336521';
 
   static String _bannerAdUnitIdFor(String slot) {
-    if (!kReleaseMode) return _testBannerAdUnitId;
     switch (slot) {
-      case vaultBannerSlot:
-        return _productionVaultBannerAdUnitId;
       case generateBannerSlot:
-        return _productionGenerateBannerAdUnitId;
+        return _generateBannerAdUnitId;
       default:
-        return _productionVaultBannerAdUnitId;
+        return _vaultBannerAdUnitId;
     }
   }
 

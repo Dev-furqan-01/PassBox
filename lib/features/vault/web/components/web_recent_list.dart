@@ -21,6 +21,9 @@ class WebRecentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final displayedItems = [...recentItems]
+      ..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+    final items = displayedItems.take(5).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +61,7 @@ class WebRecentList extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '${recentItems.length}',
+                    '${items.length}',
                     style: AppTextStyles.labelBadge.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
@@ -85,7 +88,7 @@ class WebRecentList extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.compactMd),
-        if (recentItems.isEmpty)
+        if (items.isEmpty)
           _buildEmptyState(context)
         else
           Container(
@@ -97,10 +100,10 @@ class WebRecentList extends StatelessWidget {
               ),
             ),
             child: Column(
-              children: recentItems.asMap().entries.map((entry) {
+              children: items.asMap().entries.map((entry) {
                 final index = entry.key;
                 final item = entry.value;
-                final isLast = index == recentItems.length - 1;
+                final isLast = index == items.length - 1;
                 return MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: _buildCompactListItem(

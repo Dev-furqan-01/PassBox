@@ -26,6 +26,7 @@ class _WebAddItemScreenState extends State<WebAddItemScreen> with SingleTickerPr
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _iconController = TextEditingController();
+  final _notesController = TextEditingController();
 
   bool _isFavorite = false;
   bool _isLoading = false;
@@ -56,6 +57,7 @@ class _WebAddItemScreenState extends State<WebAddItemScreen> with SingleTickerPr
       _usernameController.text = widget.vaultToEdit!.username;
       _passwordController.text = widget.vaultToEdit!.password;
       _iconController.text = widget.vaultToEdit!.icon ?? '';
+      _notesController.text = widget.vaultToEdit!.notes ?? '';
       _isFavorite = widget.vaultToEdit!.isFavorite;
     }
   }
@@ -67,6 +69,7 @@ class _WebAddItemScreenState extends State<WebAddItemScreen> with SingleTickerPr
     _usernameController.dispose();
     _passwordController.dispose();
     _iconController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -96,6 +99,7 @@ class _WebAddItemScreenState extends State<WebAddItemScreen> with SingleTickerPr
           password: _passwordController.text,
           icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
           isFavorite: _isFavorite,
+          notes: _notesController.text.trim(),
         );
       } else {
         await _vaultService.createVault(
@@ -105,6 +109,7 @@ class _WebAddItemScreenState extends State<WebAddItemScreen> with SingleTickerPr
           icon: _iconController.text.trim().isEmpty ? null : _iconController.text.trim(),
           isFavorite: _isFavorite,
           version: 1,
+          notes: _notesController.text.trim(),
         );
       }
 
@@ -148,7 +153,8 @@ class _WebAddItemScreenState extends State<WebAddItemScreen> with SingleTickerPr
     return _serviceController.text.isNotEmpty ||
            _usernameController.text.isNotEmpty ||
            _passwordController.text.isNotEmpty ||
-           _iconController.text.isNotEmpty;
+           _iconController.text.isNotEmpty ||
+           _notesController.text.isNotEmpty;
   }
 
   bool _handleEscapeKey(KeyEvent event) {
@@ -257,6 +263,7 @@ class _WebAddItemScreenState extends State<WebAddItemScreen> with SingleTickerPr
                                   usernameController: _usernameController,
                                   passwordController: _passwordController,
                                   iconController: _iconController,
+                                  notesController: _notesController,
                                   obscurePassword: _obscurePassword,
                                   showEmojiPicker: _showEmojiPicker,
                                   isFavorite: _isFavorite,

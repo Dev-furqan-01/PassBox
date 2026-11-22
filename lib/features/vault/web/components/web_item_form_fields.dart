@@ -10,6 +10,7 @@ class WebItemFormFields extends StatelessWidget {
   final TextEditingController usernameController;
   final TextEditingController passwordController;
   final TextEditingController iconController;
+  final TextEditingController notesController;
   final bool obscurePassword;
   final bool showEmojiPicker;
   final bool isFavorite;
@@ -25,6 +26,7 @@ class WebItemFormFields extends StatelessWidget {
     required this.usernameController,
     required this.passwordController,
     required this.iconController,
+    required this.notesController,
     required this.obscurePassword,
     required this.showEmojiPicker,
     required this.isFavorite,
@@ -95,7 +97,11 @@ class WebItemFormFields extends StatelessWidget {
         // Password field with inline generator
         _buildPasswordField(context),
         const SizedBox(height: 12),
-        
+
+        // Notes field
+        _buildNotesField(context),
+        const SizedBox(height: 12),
+
         // Favorite toggle
         _buildFavoriteToggle(context),
       ],
@@ -249,6 +255,45 @@ class WebItemFormFields extends StatelessWidget {
         }
         return null;
       },
+    );
+  }
+
+  Widget _buildNotesField(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return TextFormField(
+      controller: notesController,
+      minLines: 3,
+      maxLines: 5,
+      maxLength: 500,
+      style: AppTextStyles.bodyMd.copyWith(color: theme.colorScheme.onSurface),
+      decoration: InputDecoration(
+        labelText: 'Notes (Optional)',
+        hintText: 'Add any notes about this item',
+        prefixIcon: const Icon(Icons.note_outlined, size: 20),
+        alignLabelWithHint: true,
+        labelStyle: AppTextStyles.bodySm.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        hintStyle: AppTextStyles.bodySm.copyWith(
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+        ),
+        filled: true,
+        fillColor: theme.colorScheme.surfaceContainerHighest,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      ),
     );
   }
 

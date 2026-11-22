@@ -42,21 +42,26 @@ class _PasswordHistoryState extends State<PasswordHistory> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.history,
-                      color: theme.colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Recent Generated History',
-                      style: AppTextStyles.headlineSm.copyWith(
-                        color: theme.colorScheme.onSurface,
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.history,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'Recent Generated History',
+                          style: AppTextStyles.headlineSm.copyWith(
+                            color: theme.colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Row(
                   children: [

@@ -18,6 +18,7 @@ class VaultService {
     bool isSecure = true,
     String category = 'Other',
     int version = 1,
+    String? notes,
   }) async {
     try {
       final userId = currentUserId;
@@ -57,6 +58,7 @@ class VaultService {
         passwordStrength: passwordStrength,
         isPasswordReused: isPasswordReused,
         passwordHash: passwordHash,
+        notes: notes,
       );
 
       await vaultRef.set(vault.toMap());
@@ -183,6 +185,7 @@ class VaultService {
     bool? isSecure,
     String? category,
     int? version,
+    String? notes,
   }) async {
     try {
       final userId = currentUserId;
@@ -210,6 +213,7 @@ class VaultService {
       if (isSecure != null) updateData['isSecure'] = isSecure;
       if (category != null) updateData['category'] = category;
       if (version != null) updateData['version'] = version;
+      if (notes != null) updateData['notes'] = notes;
 
       // If password is being updated, recalculate strength and check reuse
       if (password != null) {

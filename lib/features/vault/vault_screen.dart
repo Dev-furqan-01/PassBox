@@ -496,6 +496,9 @@ class _VaultScreenState extends State<VaultScreen> {
 
   Widget _buildRecentlyUpdated() {
     final theme = Theme.of(context);
+    final recentItems = [..._recentItems]
+      ..sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+    final displayedItems = recentItems.take(5).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -519,7 +522,7 @@ class _VaultScreenState extends State<VaultScreen> {
               ],
             ),
             Text(
-              '4 ITEMS',
+              '${displayedItems.length} ITEMS',
               style: AppTextStyles.labelBadge.copyWith(
                 color: theme.colorScheme.outline,
               ),
@@ -528,7 +531,7 @@ class _VaultScreenState extends State<VaultScreen> {
         ),
         const SizedBox(height: AppSpacing.spaceXs),
         Column(
-          children: _recentItems.map((item) {
+          children: displayedItems.map((item) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: VaultListItem(
